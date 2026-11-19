@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Artikel Trainer</title>
+    <meta name="description" content="Practise German articles in all four cases." />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 10'%3E%3Crect width='8' height='8' y='1' fill='%231cb0f6'/%3E%3Ccircle cx='15' cy='5' r='4' fill='%23ff4b4b'/%3E%3Cpolygon points='26,1 30,9 22,9' fill='%2358cc02'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script type="module" src="js/main.js"></script>
+  </head>
+  <body>
+    <header class="top">
+      <div class="top-row">
+        <a class="brand" href="#practice">
+          <span class="logo" aria-hidden="true">
+            <span class="mark mark-m"></span><span class="mark mark-f"></span><span class="mark mark-n"></span>
+          </span>
+          Artikel
+        </a>
+        <button id="sound-toggle" class="icon-btn" type="button" aria-label="Sound" aria-pressed="true">
+          <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9h4l5-4v14l-5-4H4z" />
+            <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" />
+          </svg>
+          <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9h4l5-4v14l-5-4H4z" />
+            <path d="M17 9l5 6M22 9l-5 6" fill="none" />
+          </svg>
+        </button>
+      </div>
+      <nav class="tabs" aria-label="Sections">
+        <a href="#practice" data-tab="practice">Practice</a>
+        <a href="#learn" data-tab="learn">Learn</a>
+        <a href="#nouns" data-tab="nouns">Nouns</a>
+      </nav>
+    </header>
+    <main>
+      <div id="view-practice"></div>
+      <div id="view-learn" hidden></div>
+      <div id="view-nouns" hidden></div>
+    </main>
+  </body>
+</html>
