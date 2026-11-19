@@ -453,8 +453,10 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .summary .next { justify-self: center; }
 
 /* ---------- Tables ---------- */
-.tables { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 14px; }
-.table-wrap { margin: 0; }
+/* A table needs about 360px; two only sit side by side when both fit, otherwise they stack. */
+.tables { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); margin-top: 14px; }
+/* Never overlap a neighbour: a table that is still too wide scrolls inside its own box. */
+.table-wrap { margin: 0; min-width: 0; overflow-x: auto; }
 .table-wrap figcaption { font-weight: 800; margin-bottom: 6px; }
 .declension { width: 100%; border-collapse: separate; border-spacing: 0 4px; }
 .declension th, .declension td { padding: 7px 6px; text-align: center; }
@@ -619,6 +621,11 @@ details.panel[open] > summary { margin-bottom: 4px; }
 /* ---------- Small screens ---------- */
 @media (max-width: 480px) {
   .sentence { font-size: 1.4rem; }
+  /* Tighter tables, so all four gender columns fit on a phone. */
+  .declension { font-size: 0.9rem; }
+  .declension th, .declension td { padding: 6px 3px; }
+  .declension thead th { white-space: normal; font-size: 0.7rem; }
+  .declension tbody th { padding-left: 6px; }
   .next { justify-self: stretch; }
   .summary .next { justify-self: stretch; }
   .panel { padding: 16px; }
