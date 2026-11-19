@@ -169,8 +169,8 @@
     "round": "Runda",
     "startAt": "Zacznij od",
     "startHint": "Zacznij wyżej, żeby dostać premię punktową do pierwszego błędu.",
-    "bonus": "Premia ×{bonus}",
-    "bonusTitle": "Premia startowa: znika przy pierwszym błędzie",
+    "bonus": "Premia startowa",
+    "bonusTitle": "Twój mnożnik startuje wyżej do pierwszego błędu",
     "bonusLost": "Premia stracona!"
   },
   "learn": {

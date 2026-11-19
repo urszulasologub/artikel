@@ -173,7 +173,8 @@ test('starting at Hard skips to round 3 with a bonus that ends at the first mist
   await rush(page).getByRole('button', { name: 'Start' }).click();
 
   await expect(rush(page).locator('.round-banner')).toContainText('Round 3');
-  await expect(rush(page).locator('.start-bonus-badge')).toHaveText('Bonus ×1.7');
+  await expect(rush(page).locator('.start-bonus-badge')).toHaveText('Start bonus');
+  await expect(rush(page).locator('.combo')).toHaveText('×1.7'); // the multiplier starts at the bonus
 
   // Answer until the first mistake; the bonus badge then goes away.
   const card = rush(page).locator('.rush-card');

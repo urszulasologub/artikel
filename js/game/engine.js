@@ -17,7 +17,7 @@ export function createGame(rules = RULES, startLevel = rules.startLevels[0].leve
   return withRound({
     over: false,
     startLevel: start.level,
-    // Multiplies all points until the first mistake, for starting at a harder level.
+    // The combo multiplier starts here instead of 1, until the first mistake (for a harder start).
     startBonus: start.bonus,
     round: 0, // index into rules.rounds; past the end means an endless round
     answeredInRound: 0,
@@ -52,10 +52,13 @@ export function roundSettings(index, cases, rules = RULES) {
   return settings;
 }
 
-/** Points multiplier for a number of right answers in a row, e.g. 1.2 for 10. */
-export function multiplier(combo, rules = RULES) {
+/**
+ * Points multiplier for a number of right answers in a row, e.g. 1.2 for 10.
+ * @param {number} [base] where it starts: 1, or a start bonus such as 1.7 (then 1.9 for 10 in a row)
+ */
+export function multiplier(combo, rules = RULES, base = 1) {
   const steps = Math.floor(combo / rules.combo.every);
-  return Math.min(rules.combo.max, Math.round((1 + steps * rules.combo.bonus) * 10) / 10);
+  return Math.min(rules.combo.max, Math.round((base + steps * rules.combo.bonus) * 10) / 10);
 }
 
 /** The player picked the wrong case. Costs the question's heart right away (see rules.hearts). */
@@ -78,12 +81,12 @@ export function answer(game, result, rules = RULES) {
   let next = { ...game, answeredInRound: game.answeredInRound + 1 };
 
   if (result === 'right') {
-    const before = multiplier(next.combo, rules);
+    const before = multiplier(next.combo, rules, next.startBonus);
     next.combo += 1;
     next.bestCombo = Math.max(next.bestCombo, next.combo);
-    const factor = multiplier(next.combo, rules);
+    const factor = multiplier(next.combo, rules, next.startBonus);
     if (factor > before) events.push({ type: 'comboUp', multiplier: factor });
-    next = addPoints(next, round.points * factor * next.startBonus, events);
+    next = addPoints(next, round.points * factor, events);
 
     if (round.timer) {
       next.timeLeft += round.timer.bonus * 1000;

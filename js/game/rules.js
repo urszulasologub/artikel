@@ -19,6 +19,7 @@ export const RULES = {
 
   // Points are multiplied while answering right in a row:
   // ×1.2 from 10 in a row, ×1.4 from 20, … up to `max`. Points are rounded to whole numbers.
+  // A start bonus (startLevels below) raises the starting point: ×1.7, then ×1.9, then the max.
   combo: { every: 10, bonus: 0.2, max: 2 },
 
   // Right article but wrong case: a share of the points, and the combo ends.
@@ -26,8 +27,9 @@ export const RULES = {
   partial: { pointsShare: 0.5 },
 
   // Where a game can start: `round` is an index into `rounds` below, and `level` names it on the start
-  // screen (a difficulty preset). Skipping easy rounds multiplies all points by `bonus` until the first
-  // mistake (wrong case, wrong article, half-right or running out of time).
+  // screen (a difficulty preset). Skipping easy rounds starts the combo multiplier at `bonus` instead
+  // of 1 (still capped at combo.max), until the first mistake (wrong case, wrong article, half-right or
+  // running out of time).
   startLevels: [
     { level: 'easy', round: 0, bonus: 1 },
     { level: 'medium', round: 1, bonus: 1.4 },

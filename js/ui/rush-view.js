@@ -321,7 +321,7 @@ export function mountRushView(root, { wordSets, storage }) {
   function renderHud() {
     const { game, effects } = state;
     const round = roundConfig(game.round);
-    const factor = multiplier(game.combo);
+    const factor = multiplier(game.combo, RULES, game.startBonus);
 
     const hearts = Array.from({ length: RULES.hearts.max }, (_, i) => {
       let className = i < game.hearts ? 'heart' : 'heart empty';
@@ -339,8 +339,7 @@ export function mountRushView(root, { wordSets, storage }) {
           effects.flashes.map(({ text, kind }) => el('span', { class: `flash ${kind}`, 'aria-hidden': 'true' }, text)),
         ),
         (game.startBonus > 1 || factor > 1) && el('div', { class: 'hud-badges' },
-          game.startBonus > 1 && el('span', { class: 'start-bonus-badge', title: t('rush.bonusTitle') },
-            t('rush.bonus', { bonus: game.startBonus })),
+          game.startBonus > 1 && el('span', { class: 'start-bonus-badge', title: t('rush.bonusTitle') }, t('rush.bonus')),
           factor > 1 && el('span', { class: `combo${effects.comboUp ? ' bump' : ''}`, title: t('quiz.streakTitle', { count: game.combo }) },
             `×${factor}`)),
       ),

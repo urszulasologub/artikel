@@ -161,8 +161,8 @@
     "round": "Round",
     "startAt": "Start at",
     "startHint": "Start higher for a points bonus that lasts until your first mistake.",
-    "bonus": "Bonus ×{bonus}",
-    "bonusTitle": "Start bonus: lost at your first mistake",
+    "bonus": "Start bonus",
+    "bonusTitle": "Your multiplier starts higher until your first mistake",
     "bonusLost": "Bonus lost!"
   },
   "learn": {

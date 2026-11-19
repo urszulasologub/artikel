@@ -35,6 +35,7 @@ test('start levels point at real rounds with the same level, and harder starts p
     assert.ok(PRESETS[start.level], `start level "${start.level}" is not a difficulty preset`);
     assert.equal(RULES.rounds[start.round]?.level, start.level, `start at "${start.level}" points to another level`);
     assert.ok(start.bonus >= 1 && start.bonus > previousBonus, `start at "${start.level}": bonus must grow`);
+    assert.ok(start.bonus <= RULES.combo.max, `start at "${start.level}": bonus above the combo cap`);
     previousBonus = start.bonus;
   }
   assert.equal(RULES.startLevels[0].round, 0);

@@ -174,9 +174,12 @@ test('starting at a harder level skips rounds and gives a bonus until the first 
   assert.equal(after.score, 30 + 20); // no bonus after the mistake
 });
 
-test('the bonus and the combo multiply each other', () => {
+test('the start bonus is where the combo multiplier starts, and the cap still holds', () => {
+  assert.equal(multiplier(0, RULES, 1.5), 1.5);
+  assert.equal(multiplier(2, RULES, 1.5), 2); // 1.5 + 0.5
+  assert.equal(multiplier(4, RULES, 1.5), 2); // capped
   const { game } = play(createGame(RULES, 'hard'), ['right', 'right']);
-  assert.equal(game.score, 30 + Math.round(20 * 1.5 * 1.5)); // second answer: combo ×1.5, bonus ×1.5
+  assert.equal(game.score, 30 + 40); // ×1.5, then ×2.0 — not ×1.5 × ×1.5
 });
 
 test('a wrong case, a half-right answer or running out of time also ends the bonus', () => {
