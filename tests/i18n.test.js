@@ -34,7 +34,7 @@ test('lists have the same length in every language', () => {
 });
 
 test('every key used in the code exists in English', async () => {
-  const files = ['quiz-view', 'words-view', 'tutorial-view', 'table', 'set-name'].map((name) => `js/ui/${name}.js`);
+  const files = ['quiz-view', 'question-card', 'words-view', 'tutorial-view', 'table', 'set-name'].map((name) => `js/ui/${name}.js`);
   files.push('js/main.js', 'js/quiz/generator.js', 'index.html');
   const english = new Set(keyPaths(LANGUAGES.en.dictionary));
   for (const file of files) {

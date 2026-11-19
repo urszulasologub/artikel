@@ -343,6 +343,8 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .gap.shake { animation: shake 380ms ease; }
 
 .noun { font-weight: 900; }
+/* Which word goes in the gap when typing, e.g. "(ein)". */
+.gap-hint { color: var(--muted); font-weight: 700; font-size: 0.8em; }
 
 .translation { color: var(--muted); font-weight: 600; margin: -8px 0 0; animation: rise 240ms ease; }
 .translation::before { content: "“"; }

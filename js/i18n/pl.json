@@ -51,7 +51,7 @@
     "whichCase": "Jaki to przypadek?",
     "pickArticle": "Teraz wybierz rodzajnik",
     "key": "Klawisz {n}",
-    "typePlaceholder": "Wpisz rodzajnik",
+    "typePlaceholder": "Wpisz właściwą formę „{hint}”",
     "yourAnswer": "Twoja odpowiedź",
     "check": "Sprawdź",
     "continue": "Dalej",

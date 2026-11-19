@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { articleChoices, getArticle, nounForm } from '../js/grammar/articles.js';
+import { articleChoices, einWord, getArticle, nounForm } from '../js/grammar/articles.js';
 
 const mann = { word: 'Mann', gender: 'm', plural: 'Männer', genitive: 'Mannes' };
 const frau = { word: 'Frau', gender: 'f', plural: 'Frauen', genitive: 'Frau' };
@@ -33,4 +33,15 @@ test('noun forms', () => {
   assert.equal(nounForm(frau, 'dat', true), 'Frauen');
   assert.equal(nounForm(auto, 'dat', true), 'Autos');
   assert.equal(nounForm(mann, 'akk', true), 'Männer');
+});
+
+test('ein-words are built from endings, ready for possessives', () => {
+  const mein = einWord('mein');
+  assert.equal(mein.dat.m, 'meinem');
+  assert.equal(mein.nom.pl, 'meine');
+  assert.equal(mein.gen.pl, 'meiner');
+  const euer = einWord('euer', { stem: 'eur' });
+  assert.equal(euer.nom.m, 'euer');
+  assert.equal(euer.dat.f, 'eurer');
+  assert.equal(einWord('ein', { plural: false }).nom.pl, null);
 });

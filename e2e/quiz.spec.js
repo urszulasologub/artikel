@@ -11,6 +11,7 @@ import {
   pressContinue,
   seedBruderQuestion,
   setCases,
+  settingsPanel,
 } from './helpers.js';
 
 const ALL_CASES = ['Nominativ', 'Akkusativ', 'Dativ', 'Genitiv'];
@@ -329,5 +330,21 @@ test('a right answer keeps the page still; a wrong one scrolls to Continue', asy
   await expect(card(page).locator('.feedback.bad')).toBeVisible();
   await expect(card(page).locator('.next')).toBeInViewport();
   expect(await scrollY()).toBeGreaterThan(before);
+  app.expectNoErrors();
+});
+
+test('when typing, the gap says which word to use', async ({ page }) => {
+  await seedBruderQuestion(page);
+  const app = await openApp(page);
+  await settingsPanel(page).getByLabel('Typing', { exact: true }).check();
+
+  await expect(card(page).locator('.gap-hint')).toHaveText('(ein)');
+  await card(page).locator('.case-choice', { hasText: 'Dativ' }).click();
+  const input = card(page).getByRole('textbox', { name: 'Your answer' });
+  await expect(input).toHaveAttribute('placeholder', 'Type the right form of "ein"');
+  await input.fill('einem');
+  await input.press('Enter');
+  await expect(card(page).locator('.feedback.ok')).toBeVisible();
+  await expect(card(page).locator('.gap-hint')).toHaveCount(0);
   app.expectNoErrors();
 });

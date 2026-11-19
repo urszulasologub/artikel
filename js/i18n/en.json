@@ -46,7 +46,7 @@
     "whichCase": "Which case is it?",
     "pickArticle": "Now pick the article",
     "key": "Key {n}",
-    "typePlaceholder": "Type the article",
+    "typePlaceholder": "Type the right form of \"{hint}\"",
     "yourAnswer": "Your answer",
     "check": "Check",
     "continue": "Continue",

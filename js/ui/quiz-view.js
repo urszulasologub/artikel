@@ -1,17 +1,27 @@
 // Practice tab: settings panel, question card and the optional grammar table.
 
 import { ARTICLE_TYPES, CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
-import { language, t } from '../i18n/index.js';
-import { checkAnswer, createQuestion, explain, translateQuestion } from '../quiz/generator.js';
-import { nounMeaning } from '../quiz/translate.js';
+import { t } from '../i18n/index.js';
+import { createQuestion } from '../quiz/generator.js';
 import { ROUND_LENGTH, createRound, nextRetryQuestion, recordAnswer, roundPhase, summarize } from '../quiz/round.js';
 import { loadProgress, saveProgress } from '../progress.js';
 import { PRESETS, activePreset, applyPreset, loadSettings, saveSettings } from '../settings.js';
 import { el } from './dom.js';
 import { genderMark } from './marks.js';
+import {
+  awaitingCase,
+  handleNumberKey,
+  isPartial,
+  newAnswer,
+  pickCase,
+  renderQuestion,
+  renderTranslation,
+  resultClass,
+  submitAnswer,
+} from './question-card.js';
+import { setName } from './set-name.js';
 import { playSound } from './sound.js';
 import { declensionTable } from './table.js';
-import { setName } from './set-name.js';
 
 const STREAK_MILESTONE = 5;
 
@@ -19,21 +29,12 @@ export function mountQuizView(root, { wordSets }) {
   const saved = loadProgress();
   const state = {
     settings: loadSettings(),
-    question: null,
-    answered: false,
-    userAnswer: '',
-    caseAnswer: null,
-    caseCorrect: true,
-    articleCorrect: false,
-    correct: false,
+    answer: newAnswer(null),
     tableOpen: true,
     settingsOpen: readSettingsOpen(),
     round: saved?.round ?? createRound(),
     showSummary: saved?.showSummary ?? false,
     streak: saved?.streak ?? 0,
-    // True only for the render right after answering, so animations don't replay on later re-renders.
-    justAnswered: false,
-    justPickedCase: false,
   };
 
   const settingsSlot = el('div');
@@ -42,16 +43,13 @@ export function mountQuizView(root, { wordSets }) {
   root.append(settingsSlot, cardSlot, tableSlot);
 
   function showQuestion(question) {
-    state.question = question;
-    state.answered = false;
-    state.userAnswer = '';
-    state.caseAnswer = null;
+    state.answer = newAnswer(question);
     render();
   }
 
   function nextQuestion() {
     const nouns = wordSets.activeSet().nouns;
-    showQuestion(createQuestion(state.settings, { previousKey: state.question?.key, nouns }));
+    showQuestion(createQuestion(state.settings, { previousKey: state.answer.question?.key, nouns }));
   }
 
   function next() {
@@ -70,37 +68,35 @@ export function mountQuizView(root, { wordSets }) {
     nextQuestion();
   }
 
-  function pickCase(grammarCase) {
-    if (!awaitingCase(state)) return;
-    state.caseAnswer = grammarCase;
-    playSound(grammarCase === state.question.case ? 'step' : 'wrong');
-    state.justPickedCase = true;
+  function onPickCase(grammarCase) {
+    const { answer, settings } = state;
+    if (!pickCase(answer, settings, grammarCase)) return;
+    playSound(grammarCase === answer.question.case ? 'step' : 'wrong');
+    answer.justPickedCase = true;
     render();
-    state.justPickedCase = false;
+    answer.justPickedCase = false;
     cardSlot.querySelector('.choice, .answer-input')?.focus({ preventScroll: true });
   }
 
-  function submit(answer) {
-    if (!state.question || state.answered || awaitingCase(state) || !answer.trim()) return;
-    state.answered = true;
-    state.userAnswer = answer.trim();
-    state.articleCorrect = checkAnswer(state.question, answer);
-    state.caseCorrect = !askingCase(state) || state.caseAnswer === state.question.case;
-    state.correct = state.articleCorrect && state.caseCorrect;
-    state.round = recordAnswer(state.round, state.question, state.correct, isPartial(state));
-    state.streak = state.correct ? state.streak + 1 : 0;
+  function onSubmit(input) {
+    const { answer, settings } = state;
+    if (!submitAnswer(answer, settings, input)) return;
+    state.round = recordAnswer(state.round, answer.question, answer.correct, isPartial(answer));
+    state.streak = answer.correct ? state.streak + 1 : 0;
 
     // A right article with the wrong case is half right: it gets the success sound, not the "wrong" one.
-    if (state.correct) playSound(state.streak % STREAK_MILESTONE === 0 ? 'streak' : 'correct');
-    else playSound(isPartial(state) ? 'correct' : 'wrong');
+    if (answer.correct) playSound(state.streak % STREAK_MILESTONE === 0 ? 'streak' : 'correct');
+    else playSound(isPartial(answer) ? 'correct' : 'wrong');
 
-    state.justAnswered = true;
+    answer.justAnswered = true;
     render();
-    state.justAnswered = false;
+    answer.justAnswered = false;
     // Focusing Continue makes the browser scroll down to it (and the table). Only do that after a real
     // mistake, when the explanation and table are worth seeing; otherwise keep the page still.
-    cardSlot.querySelector('.next')?.focus({ preventScroll: resultClass(state) !== 'bad' });
+    cardSlot.querySelector('.next')?.focus({ preventScroll: resultClass(answer) !== 'bad' });
   }
+
+  const handlers = { pickCase: onPickCase, submit: onSubmit };
 
   function updateSettings(changes, { newQuestion = false } = {}) {
     state.settings = { ...state.settings, ...changes };
@@ -110,43 +106,34 @@ export function mountQuizView(root, { wordSets }) {
   }
 
   function render() {
-    saveProgress(state);
-    settingsSlot.replaceChildren(renderSettings(state.settings, updateSettings, state.settingsOpen, (open) => {
+    const { answer, settings } = state;
+    saveProgress({ ...state, question: answer.question, answered: answer.answered });
+    settingsSlot.replaceChildren(renderSettings(settings, updateSettings, state.settingsOpen, (open) => {
       state.settingsOpen = open;
       writeSettingsOpen(open);
     }, wordSets));
     let card;
     if (state.showSummary) card = renderSummary(state, newRound);
-    else if (!state.question) card = renderEmptySet(wordSets.activeSet());
-    else card = renderCard(state, { submit, next, pickCase, newRound });
+    else if (!answer.question) card = renderEmptySet(wordSets.activeSet());
+    else card = renderCard(state, { handlers, next, newRound });
     cardSlot.replaceChildren(card);
     tableSlot.replaceChildren(renderTable(state, () => {
       state.tableOpen = !state.tableOpen;
       render();
     }));
-    if (state.settings.inputMode === 'type' && !state.answered && !awaitingCase(state)) {
+    if (settings.inputMode === 'type' && !answer.answered && !awaitingCase(answer, settings)) {
       cardSlot.querySelector('input')?.focus({ preventScroll: true });
     }
   }
 
-  // Number keys pick a case or an article on desktop.
   document.addEventListener('keydown', (event) => {
-    if (root.hidden || !state.question || state.answered || state.showSummary) return;
-    if (event.target instanceof HTMLInputElement) return;
-    const index = Number(event.key) - 1;
-    if (awaitingCase(state)) {
-      const grammarCase = caseOptions(state)[index];
-      if (grammarCase) pickCase(grammarCase);
-    } else if (state.settings.inputMode === 'choice') {
-      const choice = state.question.choices[index];
-      if (choice) submit(choice);
-    }
+    if (!root.hidden && !state.showSummary) handleNumberKey(event, state.answer, state.settings, handlers);
   });
 
   // Continue the saved quiz, if there is one.
   function restore() {
     if (!saved) return nextQuestion();
-    state.question = saved.question;
+    state.answer = newAnswer(saved.question);
     if (saved.showSummary) return render();
     if (!saved.question) return nextQuestion();
     if (!saved.answered) return showQuestion(saved.question);
@@ -163,7 +150,7 @@ export function mountQuizView(root, { wordSets }) {
   wordSets.onChange(() => {
     const switched = wordSets.activeSet().id !== currentSetId;
     currentSetId = wordSets.activeSet().id;
-    if (!state.showSummary && (switched || !state.question)) nextQuestion();
+    if (!state.showSummary && (switched || !state.answer.question)) nextQuestion();
     else render();
   });
 
@@ -235,65 +222,15 @@ function renderSettings(settings, update, open, onToggle, wordSets) {
   );
 }
 
-/** True when the user must name the case before the article (needs more than one case to choose from). */
-function askingCase({ settings }) {
-  return settings.askCase && settings.cases.length > 1;
-}
-
-/** The cases offered as answers. Includes the question's own case, which a retried question may need
- * after the case list was changed in the middle of a round. */
-function caseOptions({ settings, question }) {
-  return CASES.filter((grammarCase) => settings.cases.includes(grammarCase) || grammarCase === question.case);
-}
-
-/** Right article, wrong case. */
-function isPartial({ correct, articleCorrect }) {
-  return !correct && articleCorrect;
-}
-
-/** Colour of the answer: green (ok), yellow (partial: right article, wrong case) or red (bad). */
-function resultClass(state) {
-  if (state.correct) return 'ok';
-  return isPartial(state) ? 'partial' : 'bad';
-}
-
-function awaitingCase(state) {
-  return askingCase(state) && state.caseAnswer === null && !state.answered;
-}
-
-function renderCard(state, { submit, next, pickCase, newRound }) {
-  const { question, settings, answered, articleCorrect, justAnswered } = state;
-  const asking = askingCase(state);
-  const waiting = awaitingCase(state);
-  // With "choose the case first", the case stays hidden until it has been picked.
-  const caseKnown = asking ? state.caseAnswer !== null || answered : settings.showCase;
-
-  const nounClass = settings.showGender || answered ? `noun g-${question.gender}` : 'noun';
-  const animation = justAnswered ? (articleCorrect ? ' pop' : ' shake') : '';
-  const gap = answered
-    ? el('span', { class: `gap filled ${articleCorrect ? 'ok' : 'bad'}${animation}` }, question.answer)
-    : el('span', { class: caseKnown ? `gap case-gap c-${question.case}` : 'gap' }, ' ');
-
-  const hints = [
-    caseKnown && el('span', { class: `tag case-tag c-${question.case}` },
-      CASE_NAMES[question.case], el('span', { class: 'case-q' }, CASE_QUESTIONS[question.case])),
-    settings.showGender && el('span', { class: `tag g-${question.gender}` },
-      genderMark(question.gender), t(`genders.${question.gender}`)),
-    renderMeaning(question),
-  ];
-
+function renderCard(state, { handlers, next, newRound }) {
+  const { answer, settings } = state;
+  const nextClass = { ok: '', partial: 'warning', bad: 'danger' }[resultClass(answer)];
   return el(
     'section',
     { class: 'panel card', 'aria-live': 'polite' },
     renderProgress(state, newRound),
-    el('p', { class: 'sentence' }, question.before, gap, ' ', el('span', { class: nounClass }, question.nounText), question.after),
-    answered && renderTranslation(question, 'p'),
-    el('div', { class: 'hints' }, hints),
-    asking && renderCaseStep(state, pickCase),
-    !waiting && asking && el('p', { class: 'step-label' }, t('quiz.pickArticle')),
-    !waiting && (settings.inputMode === 'choice' ? renderChoices(state, submit) : renderTyping(state, submit)),
-    answered && renderFeedback(state),
-    answered && el('button', { type: 'button', class: `btn primary next ${{ ok: '', partial: 'warning', bad: 'danger' }[resultClass(state)]}`.trim(), onClick: next },
+    renderQuestion(answer, settings, handlers),
+    answer.answered && el('button', { type: 'button', class: `btn primary next ${nextClass}`.trim(), onClick: next },
       nextButtonLabel(state.round)),
   );
 }
@@ -313,7 +250,8 @@ function renderEmptySet(set) {
   );
 }
 
-function renderProgress({ round, answered, streak, justAnswered }, newRound) {
+function renderProgress({ round, answer, streak }, newRound) {
+  const { answered, justAnswered } = answer;
   // The retry bar shows once the first retry question is on screen.
   const retrying = round.retryResults.length > 0 || (roundPhase(round) === 'retry' && !answered);
   const results = retrying ? round.retryResults : round.results;
@@ -386,94 +324,11 @@ function renderSummary({ round }, newRound) {
   );
 }
 
-function renderChoices({ question, answered, userAnswer }, submit) {
-  return el('div', { class: 'choices' }, question.choices.map((choice, index) => {
-    let status = '';
-    if (answered && choice === question.answer) status = ' ok';
-    else if (answered && choice === userAnswer) status = ' bad';
-    return el('button', {
-      type: 'button',
-      class: `btn choice${status}`,
-      disabled: answered,
-      title: t('quiz.key', { n: index + 1 }),
-      onClick: () => submit(choice),
-    }, choice);
-  }));
-}
-
-function renderTyping({ answered, userAnswer, correct }, submit) {
-  const input = el('input', {
-    type: 'text',
-    class: `answer-input${answered ? (correct ? ' ok' : ' bad') : ''}`,
-    value: userAnswer,
-    disabled: answered,
-    placeholder: t('quiz.typePlaceholder'),
-    autocomplete: 'off',
-    autocapitalize: 'off',
-    spellcheck: false,
-    'aria-label': t('quiz.yourAnswer'),
-  });
-  return el('form', {
-    class: 'type-form',
-    onSubmit: (event) => {
-      event.preventDefault();
-      submit(input.value);
-    },
-  }, input, !answered && el('button', { type: 'submit', class: 'btn primary' }, t('quiz.check')));
-}
-
-function renderCaseStep(state, pickCase) {
-  const { question, caseAnswer, justPickedCase } = state;
-  const buttons = caseOptions(state).map((grammarCase, index) => {
-    let status = '';
-    if (caseAnswer && grammarCase === question.case) status = ' ok';
-    else if (grammarCase === caseAnswer) status = ' bad';
-    if (status && justPickedCase) status += ' pop';
-    return el('button', {
-      type: 'button',
-      class: `btn case-choice c-${grammarCase}${status}`,
-      disabled: caseAnswer !== null,
-      title: t('quiz.key', { n: index + 1 }),
-      onClick: () => pickCase(grammarCase),
-    }, CASE_NAMES[grammarCase], el('span', { class: 'case-q' }, CASE_QUESTIONS[grammarCase]));
-  });
-  return el('div', { class: 'step' },
-    el('p', { class: 'step-label' }, t('quiz.whichCase')),
-    el('div', { class: 'case-choices' }, buttons),
-  );
-}
-
-function feedbackTitle({ question, correct, caseCorrect, articleCorrect }) {
-  const params = { answer: question.answer, case: CASE_NAMES[question.case] };
-  if (correct) return t('feedback.correct');
-  if (!caseCorrect && articleCorrect) return t('feedback.wrongCaseRightArticle', params);
-  if (!caseCorrect) return t('feedback.wrongCase', params);
-  return t('feedback.wrong', params);
-}
-
-/** The sentence in the interface language. Words without a translation (user-added) show none. */
-function renderTranslation(question, tag) {
-  const translation = translateQuestion(question, language);
-  return translation && el(tag, { class: 'translation' }, translation);
-}
-
-function renderMeaning(question) {
-  const meaning = nounMeaning(question.noun, language);
-  return meaning && el('span', { class: 'meaning' }, `${meaning}${question.plural ? ` (${t('quiz.plural')})` : ''}`);
-}
-
-function renderFeedback(state) {
-  const { question, correct } = state;
-  return el('div', { class: `feedback ${resultClass(state)}` },
-    el('strong', {}, feedbackTitle(state)),
-    el('p', {}, explain(question, t)),
-  );
-}
-
-function renderTable({ settings, question, answered, tableOpen }, toggle) {
+function renderTable({ settings, answer, tableOpen }, toggle) {
   if (settings.tableMode === 'hidden') return el('div');
 
   const visible = settings.tableMode === 'open' || tableOpen;
+  const { question, answered } = answer;
   const highlight = answered ? { case: question.case, gender: question.gender } : null;
   const tables = settings.articleTypes.map((type) => declensionTable(type, settings.cases, highlight));
 

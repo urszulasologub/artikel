@@ -19,10 +19,40 @@ export const CASE_QUESTIONS = {
 
 export const GENDERS = ['m', 'f', 'n', 'pl'];
 
-// `null` means the form does not exist (there is no plural of "ein").
+// Endings shared by ein, kein and the possessives (mein, dein, sein, ihr, unser, euer).
+const EIN_ENDINGS = {
+  nom: { m: '', f: 'e', n: '', pl: 'e' },
+  akk: { m: 'en', f: 'e', n: '', pl: 'e' },
+  dat: { m: 'em', f: 'er', n: 'em', pl: 'en' },
+  gen: { m: 'es', f: 'er', n: 'es', pl: 'er' },
+};
+
+/**
+ * Builds the declension table of an ein-word.
+ * @param {string} base the plain form, e.g. "mein"
+ * @param {{ stem?: string, plural?: boolean }} [options]
+ *   stem: used before an ending, e.g. "eur" for euer (eurem); plural: false for "ein", which has none
+ */
+export function einWord(base, { stem = base, plural = true } = {}) {
+  const forms = {};
+  for (const [grammarCase, endings] of Object.entries(EIN_ENDINGS)) {
+    forms[grammarCase] = {};
+    for (const [gender, ending] of Object.entries(endings)) {
+      const exists = gender !== 'pl' || plural;
+      forms[grammarCase][gender] = exists ? (ending ? stem + ending : base) : null;
+    }
+  }
+  return forms;
+}
+
+// Each article type: a label for settings, a `hint` shown next to the gap when typing
+// ("Ich helfe ___ (ein) Bruder"), and its forms. `null` means the form does not exist.
+// To add e.g. possessives: { label: 'mein / meine', hint: 'mein', forms: einWord('mein') }.
+// (Sentence translations would then also need to say "my" instead of "a".)
 export const ARTICLE_TYPES = {
   definite: {
     label: 'der / die / das',
+    hint: 'der/die/das',
     forms: {
       nom: { m: 'der', f: 'die', n: 'das', pl: 'die' },
       akk: { m: 'den', f: 'die', n: 'das', pl: 'die' },
@@ -32,12 +62,8 @@ export const ARTICLE_TYPES = {
   },
   indefinite: {
     label: 'ein / eine',
-    forms: {
-      nom: { m: 'ein', f: 'eine', n: 'ein', pl: null },
-      akk: { m: 'einen', f: 'eine', n: 'ein', pl: null },
-      dat: { m: 'einem', f: 'einer', n: 'einem', pl: null },
-      gen: { m: 'eines', f: 'einer', n: 'eines', pl: null },
-    },
+    hint: 'ein',
+    forms: einWord('ein', { plural: false }),
   },
 };
 
