@@ -700,6 +700,35 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .timer.urgent .timer-text { color: var(--red); }
 .timer.expired .timer-bar { animation: shake 400ms ease; }
 
+/* Combo frenzy: from 10 right answers in a row the question gets a glowing, spinning rainbow frame.
+   --frenzy goes from 0 (calm) to 1 (wild, at 30 in a row) and drives width, speed, colour and glow. */
+@property --frenzy-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.rush-card-slot { position: relative; display: grid; gap: var(--gap); border-radius: calc(var(--radius) + 6px); }
+.rush-card-slot.frenzy {
+  padding: calc(3px + 3px * var(--frenzy));
+  background: linear-gradient(135deg, var(--brand), var(--orange));
+  box-shadow: 0 0 calc(10px + 26px * var(--frenzy)) calc(1px * var(--frenzy) * 4)
+    rgba(255, 150, 0, calc(0.25 + 0.4 * var(--frenzy)));
+  transition: padding 400ms ease, box-shadow 400ms ease;
+}
+/* The rainbow layer: calm and faint at first, bright and fast at full frenzy. */
+.rush-card-slot.frenzy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(from var(--frenzy-angle),
+    var(--brand), var(--c-gen), var(--c-nom), var(--blue), var(--green), var(--brand));
+  opacity: calc(0.35 + 0.65 * var(--frenzy));
+  animation: frenzy-spin calc(9s - 7.5s * var(--frenzy)) linear infinite;
+}
+.rush-card-slot.frenzy > .card { position: relative; border-color: transparent; }
+.rush-card-slot.frenzy-max { animation: frenzy-glow 0.7s ease-in-out infinite alternate; }
+
 /* Last seconds: the whole game gently shakes. */
 .rush-shake { animation: screen-shake 0.35s linear infinite; }
 
@@ -775,6 +804,13 @@ details.panel[open] > summary { margin-bottom: 4px; }
   25% { transform: translate(-1.5px, 1px); }
   50% { transform: translate(1.5px, -1px); }
   75% { transform: translate(-1px, -1px); }
+}
+@keyframes frenzy-spin {
+  to { --frenzy-angle: 360deg; }
+}
+@keyframes frenzy-glow {
+  from { box-shadow: 0 0 26px 3px rgba(255, 79, 163, 0.55); }
+  to { box-shadow: 0 0 46px 8px rgba(255, 176, 32, 0.85); }
 }
 @keyframes breathe {
   0%, 100% { opacity: 0.6; }

@@ -53,6 +53,15 @@ export function roundSettings(index, cases, rules = RULES) {
 }
 
 /**
+ * How wild the combo frenzy looks: null below rules.frenzy.from, then 0 → 1 up to rules.frenzy.max.
+ */
+export function frenzyLevel(combo, rules = RULES) {
+  const { from, max } = rules.frenzy;
+  if (combo < from) return null;
+  return Math.min(1, (combo - from) / (max - from));
+}
+
+/**
  * Points multiplier for a number of right answers in a row, e.g. 1.2 for 10.
  * @param {number} [base] where it starts: 1, or a start bonus such as 1.7 (then 1.9 for 10 in a row)
  */

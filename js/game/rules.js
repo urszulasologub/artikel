@@ -22,6 +22,10 @@ export const RULES = {
   // A start bonus (startLevels below) raises the starting point: ×1.7, then ×1.9, then the max.
   combo: { every: 10, bonus: 0.2, max: 2 },
 
+  // Looks only: while on a combo, the question's border glows and spins. It starts at `from` right
+  // answers in a row and gets wilder until full frenzy at `max`.
+  frenzy: { from: 10, max: 30 },
+
   // Right article but wrong case: a share of the points, and the combo ends.
   // (The heart for the wrong case is set by hearts.lostForWrongCase.)
   partial: { pointsShare: 0.5 },

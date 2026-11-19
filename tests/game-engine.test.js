@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { answer, createGame, missCase, multiplier, roundConfig, tick } from '../js/game/engine.js';
+import { answer, createGame, frenzyLevel, missCase, multiplier, roundConfig, tick } from '../js/game/engine.js';
 
 // Small rules made for the tests, so tuning the real game in rules.js never breaks them.
 const RULES = {
@@ -9,6 +9,7 @@ const RULES = {
   minCases: 2,
   hearts: { start: 3, max: 3, regainEvery: 4 },
   combo: { every: 2, bonus: 0.5, max: 2 },
+  frenzy: { from: 2, max: 6 },
   partial: { pointsShare: 0.5 },
   startLevels: [
     { level: 'easy', round: 0, bonus: 1 },
@@ -194,4 +195,12 @@ test('starting at the first level has no bonus, and an unknown level falls back 
   assert.equal(game.startBonus, 1);
   assert.ok(!types(events).includes('bonusLost'));
   assert.equal(createGame(RULES, 'nonsense').round, 0);
+});
+
+test('combo frenzy starts at its threshold and grows to full', () => {
+  assert.equal(frenzyLevel(1, RULES), null);
+  assert.equal(frenzyLevel(2, RULES), 0);
+  assert.equal(frenzyLevel(4, RULES), 0.5);
+  assert.equal(frenzyLevel(6, RULES), 1);
+  assert.equal(frenzyLevel(50, RULES), 1);
 });

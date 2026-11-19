@@ -2,7 +2,16 @@
 // combos, a timer in later rounds and high scores. The only choice is which cases to practise.
 
 import { CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
-import { answer as answerGame, createGame, missCase, multiplier, roundConfig, roundSettings, tick } from '../game/engine.js';
+import {
+  answer as answerGame,
+  createGame,
+  frenzyLevel,
+  missCase,
+  multiplier,
+  roundConfig,
+  roundSettings,
+  tick,
+} from '../game/engine.js';
 import { MAX_NAME_LENGTH, createHighScores } from '../game/high-scores.js';
 import { RULES } from '../game/rules.js';
 import { t } from '../i18n/index.js';
@@ -48,7 +57,8 @@ export function mountRushView(root, { wordSets, storage }) {
 
   // The slot (not the panel inside it) is sticky, so the HUD stays under the header while scrolling.
   const hudSlot = el('div', { class: 'rush-hud-slot' });
-  const cardSlot = el('div');
+  // The card slot stays in place between questions, so the combo frenzy frame on it animates smoothly.
+  const cardSlot = el('div', { class: 'rush-card-slot' });
   const tableSlot = el('div');
   root.append(hudSlot, cardSlot, tableSlot);
 
@@ -240,8 +250,18 @@ export function mountRushView(root, { wordSets, storage }) {
 
   // ---------- Drawing ----------
 
+  /** The glowing, spinning frame around the question while on a combo (see rules.frenzy). */
+  function updateFrenzy() {
+    const level = state.screen === 'playing' ? frenzyLevel(state.game.combo) : null;
+    cardSlot.classList.toggle('frenzy', level !== null);
+    cardSlot.classList.toggle('frenzy-max', level === 1);
+    if (level === null) cardSlot.style.removeProperty('--frenzy');
+    else cardSlot.style.setProperty('--frenzy', level.toFixed(2));
+  }
+
   function render() {
     root.classList.remove('rush-shake');
+    updateFrenzy();
     if (state.screen === 'start') {
       hudSlot.replaceChildren();
       cardSlot.replaceChildren(renderStart(), renderHighScores(highScores.list(), null));

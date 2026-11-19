@@ -97,6 +97,9 @@ test('ten right answers in round 1: points, combo ×1.2, and round 2 starts', as
   }
   await expect(rush(page).locator('.round-banner')).toContainText('Round 2');
   await expect(rush(page).locator('.combo')).toHaveText('×1.2');
+  // Ten in a row: the combo frenzy frame appears, calm at first.
+  await expect(rush(page).locator('.rush-card-slot')).toHaveClass(/frenzy/);
+  await expect(rush(page).locator('.rush-card-slot')).not.toHaveClass(/frenzy-max/);
   await expect(rush(page).locator('.heart:not(.empty)')).toHaveCount(3);
   // 9 answers × 10 points, then the 10th at ×1.2 = 12.
   await expect(rush(page).locator('.score-value')).toHaveText('102');
@@ -200,5 +203,15 @@ test('the score bar never makes the page wider than the screen', async ({ page }
   await rush(page).locator('.score-value').evaluate((node) => { node.textContent = '12345'; });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+  app.expectNoErrors();
+});
+
+test('no frenzy frame before ten in a row, or on the start screen', async ({ page }) => {
+  const app = await openRush(page);
+  await expect(rush(page).locator('.rush-card-slot')).not.toHaveClass(/frenzy/);
+  await rush(page).getByRole('button', { name: 'Start' }).click();
+  await answerRight(page);
+  await rush(page).locator('.rush-card .next').click();
+  await expect(rush(page).locator('.rush-card-slot')).not.toHaveClass(/frenzy/);
   app.expectNoErrors();
 });
