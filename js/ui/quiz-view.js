@@ -97,7 +97,9 @@ export function mountQuizView(root, { wordSets }) {
     state.justAnswered = true;
     render();
     state.justAnswered = false;
-    cardSlot.querySelector('.next')?.focus();
+    // Focusing Continue makes the browser scroll down to it (and the table). Only do that after a real
+    // mistake, when the explanation and table are worth seeing; otherwise keep the page still.
+    cardSlot.querySelector('.next')?.focus({ preventScroll: resultClass(state) !== 'bad' });
   }
 
   function updateSettings(changes, { newQuestion = false } = {}) {

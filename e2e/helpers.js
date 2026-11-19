@@ -68,3 +68,26 @@ export async function answerByClicking(page, { caseIndex = 0, articleIndex = 0 }
 export async function pressContinue(page) {
   await card(page).locator('.next').click();
 }
+
+/**
+ * Starts the page on a known question: "Ich helfe ___ Bruder." (Dativ, answer "einem"),
+ * with "Choose the case first" on and Akkusativ + Dativ practised.
+ */
+export async function seedBruderQuestion(page) {
+  await page.addInitScript(() => {
+    if (localStorage.getItem('german-grammar:progress')) return;
+    localStorage.setItem('german-grammar:settings', JSON.stringify({
+      showGender: true, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'toggle',
+      cases: ['akk', 'dat'], articleTypes: ['indefinite'],
+    }));
+    const question = {
+      key: 'dat-help|Bruder|indefinite|false', sentenceId: 'dat-help', case: 'dat', articleType: 'indefinite',
+      noun: { word: 'Bruder', gender: 'm', plural: 'Brüder', genitive: 'Bruders', en: 'brother', enPlural: 'brothers', tags: ['person'] },
+      plural: false, gender: 'm', before: 'Ich helfe ', nounText: 'Bruder', after: '.',
+      answer: 'einem', choices: ['ein', 'eine', 'einem', 'einen', 'einer', 'eines'],
+    };
+    localStorage.setItem('german-grammar:progress', JSON.stringify({
+      version: 2, round: { results: [], retryResults: [] }, streak: 0, question, answered: false, showSummary: false,
+    }));
+  });
+}

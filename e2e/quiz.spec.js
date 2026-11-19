@@ -9,6 +9,7 @@ import {
   openApp,
   option,
   pressContinue,
+  seedBruderQuestion,
   setCases,
 } from './helpers.js';
 
@@ -287,24 +288,7 @@ test('the settings panel stays closed after a refresh', async ({ page }) => {
 });
 
 test('right article but wrong case shows yellow, not red', async ({ page }) => {
-  // Start from a known saved question: "Ich helfe ___ Bruder." (Dativ, answer "einem").
-  await page.addInitScript(() => {
-    localStorage.setItem('german-grammar:settings', JSON.stringify({
-      showGender: true, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'toggle',
-      cases: ['akk', 'dat'], articleTypes: ['indefinite'],
-    }));
-    const question = {
-      key: 'dat-help|Bruder|indefinite|false', sentenceId: 'dat-help', case: 'dat', articleType: 'indefinite',
-      noun: { word: 'Bruder', gender: 'm', plural: 'Brüder', genitive: 'Bruders', en: 'brother', enPlural: 'brothers', tags: ['person'] },
-      plural: false, gender: 'm', before: 'Ich helfe ', nounText: 'Bruder', after: '.',
-      answer: 'einem', choices: ['ein', 'eine', 'einem', 'einen', 'einer', 'eines'],
-    };
-    if (!localStorage.getItem('german-grammar:progress')) {
-      localStorage.setItem('german-grammar:progress', JSON.stringify({
-        version: 2, round: { results: [], retryResults: [] }, streak: 0, question, answered: false, showSummary: false,
-      }));
-    }
-  });
+  await seedBruderQuestion(page);
   const app = await openApp(page);
 
   await card(page).locator('.case-choice', { hasText: 'Akkusativ' }).click();
@@ -315,5 +299,35 @@ test('right article but wrong case shows yellow, not red', async ({ page }) => {
   await expect(card(page).locator('.next')).toHaveClass(/warning/);
   await expect(card(page).locator('.segment-bar.partial')).toHaveCount(1);
   await expect(card(page).locator('.segment-bar.bad')).toHaveCount(0);
+  app.expectNoErrors();
+});
+
+test('a right answer keeps the page still; a wrong one scrolls to Continue', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 600 });
+  await seedBruderQuestion(page);
+  const app = await openApp(page);
+  const scrollY = () => page.evaluate(() => window.scrollY);
+
+  async function answer(article) {
+    await card(page).locator('.case-choice', { hasText: 'Dativ' }).click();
+    const button = card(page).locator('.choice', { hasText: new RegExp(`^${article}$`) });
+    await button.scrollIntoViewIfNeeded(); // Playwright would scroll here anyway; measure after it
+    const before = await scrollY();
+    await button.click();
+    return before;
+  }
+
+  // Right answer: the page does not move.
+  let before = await answer('einem');
+  await expect(card(page).locator('.feedback.ok')).toBeVisible();
+  expect(await scrollY()).toBe(before);
+
+  // Same question again, wrong answer: the page scrolls down to Continue.
+  await page.evaluate(() => localStorage.removeItem('german-grammar:progress'));
+  await page.reload();
+  before = await answer('ein');
+  await expect(card(page).locator('.feedback.bad')).toBeVisible();
+  await expect(card(page).locator('.next')).toBeInViewport();
+  expect(await scrollY()).toBeGreaterThan(before);
   app.expectNoErrors();
 });
