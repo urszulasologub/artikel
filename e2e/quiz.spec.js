@@ -285,3 +285,35 @@ test('the settings panel stays closed after a refresh', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Easy', exact: true })).toBeHidden();
   app.expectNoErrors();
 });
+
+test('right article but wrong case shows yellow, not red', async ({ page }) => {
+  // Start from a known saved question: "Ich helfe ___ Bruder." (Dativ, answer "einem").
+  await page.addInitScript(() => {
+    localStorage.setItem('german-grammar:settings', JSON.stringify({
+      showGender: true, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'toggle',
+      cases: ['akk', 'dat'], articleTypes: ['indefinite'],
+    }));
+    const question = {
+      key: 'dat-help|Bruder|indefinite|false', sentenceId: 'dat-help', case: 'dat', articleType: 'indefinite',
+      noun: { word: 'Bruder', gender: 'm', plural: 'Brüder', genitive: 'Bruders', en: 'brother', enPlural: 'brothers', tags: ['person'] },
+      plural: false, gender: 'm', before: 'Ich helfe ', nounText: 'Bruder', after: '.',
+      answer: 'einem', choices: ['ein', 'eine', 'einem', 'einen', 'einer', 'eines'],
+    };
+    if (!localStorage.getItem('german-grammar:progress')) {
+      localStorage.setItem('german-grammar:progress', JSON.stringify({
+        version: 2, round: { results: [], retryResults: [] }, streak: 0, question, answered: false, showSummary: false,
+      }));
+    }
+  });
+  const app = await openApp(page);
+
+  await card(page).locator('.case-choice', { hasText: 'Akkusativ' }).click();
+  await card(page).locator('.choice', { hasText: /^einem$/ }).click();
+
+  await expect(card(page).locator('.feedback')).toHaveClass(/partial/);
+  await expect(card(page).locator('.feedback')).toContainText('the case is Dativ');
+  await expect(card(page).locator('.next')).toHaveClass(/warning/);
+  await expect(card(page).locator('.segment-bar.partial')).toHaveCount(1);
+  await expect(card(page).locator('.segment-bar.bad')).toHaveCount(0);
+  app.expectNoErrors();
+});

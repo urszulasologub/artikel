@@ -263,6 +263,8 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .btn.primary:hover:not(:disabled) { background: #61e002; }
 .btn.primary.danger { --edge: var(--red-edge); background: var(--red); border-color: var(--red); }
 .btn.primary.danger:hover:not(:disabled) { background: #ff6262; }
+.btn.primary.warning { --edge: var(--yellow-edge); background: var(--yellow); border-color: var(--yellow); }
+.btn.primary.warning:hover:not(:disabled) { background: #ffd23f; }
 
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
@@ -295,9 +297,10 @@ details.panel[open] > summary { margin-bottom: 4px; }
   position: relative;
 }
 /* Glossy highlight stripe, like a toy progress bar */
-.segment-bar.ok, .segment-bar.bad { box-shadow: inset 0 4px 0 -1px rgba(255, 255, 255, 0.35); }
+.segment-bar.ok, .segment-bar.bad, .segment-bar.partial { box-shadow: inset 0 4px 0 -1px rgba(255, 255, 255, 0.35); }
 .segment-bar.ok { background: var(--green); }
 .segment-bar.bad { background: var(--red); }
+.segment-bar.partial { background: var(--yellow); }
 .segment-bar.current { background: #c7c7c7; animation: breathe 1.4s ease-in-out infinite; }
 
 .streak { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 800; color: var(--orange); white-space: nowrap; }
@@ -409,6 +412,7 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .feedback p { margin: 4px 0 0; font-weight: 600; }
 .feedback.ok { background: var(--ok-bg); color: var(--ok); }
 .feedback.bad { background: var(--bad-bg); color: var(--bad); }
+.feedback.partial { background: #fff4d6; color: #a06c00; }
 
 .next { justify-self: end; min-width: 180px; }
 

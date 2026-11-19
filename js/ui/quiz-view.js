@@ -87,11 +87,12 @@ export function mountQuizView(root, { wordSets }) {
     state.articleCorrect = checkAnswer(state.question, answer);
     state.caseCorrect = !askingCase(state) || state.caseAnswer === state.question.case;
     state.correct = state.articleCorrect && state.caseCorrect;
-    state.round = recordAnswer(state.round, state.question, state.correct);
+    state.round = recordAnswer(state.round, state.question, state.correct, isPartial(state));
     state.streak = state.correct ? state.streak + 1 : 0;
 
-    if (!state.correct) playSound('wrong');
-    else playSound(state.streak % STREAK_MILESTONE === 0 ? 'streak' : 'correct');
+    // A right article with the wrong case is half right: it gets the success sound, not the "wrong" one.
+    if (state.correct) playSound(state.streak % STREAK_MILESTONE === 0 ? 'streak' : 'correct');
+    else playSound(isPartial(state) ? 'correct' : 'wrong');
 
     state.justAnswered = true;
     render();
@@ -243,12 +244,23 @@ function caseOptions({ settings, question }) {
   return CASES.filter((grammarCase) => settings.cases.includes(grammarCase) || grammarCase === question.case);
 }
 
+/** Right article, wrong case. */
+function isPartial({ correct, articleCorrect }) {
+  return !correct && articleCorrect;
+}
+
+/** Colour of the answer: green (ok), yellow (partial: right article, wrong case) or red (bad). */
+function resultClass(state) {
+  if (state.correct) return 'ok';
+  return isPartial(state) ? 'partial' : 'bad';
+}
+
 function awaitingCase(state) {
   return askingCase(state) && state.caseAnswer === null && !state.answered;
 }
 
 function renderCard(state, { submit, next, pickCase, newRound }) {
-  const { question, settings, answered, correct, articleCorrect, justAnswered } = state;
+  const { question, settings, answered, articleCorrect, justAnswered } = state;
   const asking = askingCase(state);
   const waiting = awaitingCase(state);
   // With "choose the case first", the case stays hidden until it has been picked.
@@ -279,7 +291,7 @@ function renderCard(state, { submit, next, pickCase, newRound }) {
     !waiting && asking && el('p', { class: 'step-label' }, t('quiz.pickArticle')),
     !waiting && (settings.inputMode === 'choice' ? renderChoices(state, submit) : renderTyping(state, submit)),
     answered && renderFeedback(state),
-    answered && el('button', { type: 'button', class: `btn primary next${correct ? '' : ' danger'}`, onClick: next },
+    answered && el('button', { type: 'button', class: `btn primary next ${{ ok: '', partial: 'warning', bad: 'danger' }[resultClass(state)]}`.trim(), onClick: next },
       nextButtonLabel(state.round)),
   );
 }
@@ -308,7 +320,7 @@ function renderProgress({ round, answered, streak, justAnswered }, newRound) {
   const segments = Array.from({ length }, (_, i) => {
     const result = results[i];
     let status = '';
-    if (result) status = result.correct ? ' ok' : ' bad';
+    if (result) status = result.correct ? ' ok' : result.partial ? ' partial' : ' bad';
     else if (i === results.length && !answered) status = ' current';
     return el('span', { class: `segment-bar${status}` });
   });
@@ -450,7 +462,7 @@ function renderMeaning(question) {
 
 function renderFeedback(state) {
   const { question, correct } = state;
-  return el('div', { class: `feedback ${correct ? 'ok' : 'bad'}` },
+  return el('div', { class: `feedback ${resultClass(state)}` },
     el('strong', {}, feedbackTitle(state)),
     el('p', {}, explain(question, t)),
   );

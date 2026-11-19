@@ -20,8 +20,12 @@ export function nextRetryQuestion(round) {
   return roundPhase(round) === 'retry' ? missedQuestions(round)[round.retryResults.length] : null;
 }
 
-export function recordAnswer(round, question, correct) {
-  const entry = { question, correct };
+/**
+ * @param {boolean} [partial] right article but wrong case: still a mistake (asked again in the retry),
+ *   but shown in yellow instead of red
+ */
+export function recordAnswer(round, question, correct, partial = false) {
+  const entry = { question, correct, partial };
   return roundPhase(round) === 'main'
     ? { ...round, results: [...round.results, entry] }
     : { ...round, retryResults: [...round.retryResults, entry] };

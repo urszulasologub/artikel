@@ -58,3 +58,10 @@ test('no weak spot when no mistake repeats', () => {
   const round = playMain([[q('dat', 'f'), false], [q('akk', 'm'), false]]);
   assert.equal(summarize(round).weakSpot, null);
 });
+
+test('a half-right answer is still a mistake that comes back in the retry', () => {
+  const half = q('dat', 'm');
+  const round = recordAnswer(createRound(), half, false, true);
+  assert.deepEqual(round.results[0], { question: half, correct: false, partial: true });
+  assert.deepEqual(summarize(playMain([[half, false]])).mistakes, [half]);
+});
