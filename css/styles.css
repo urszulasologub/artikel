@@ -635,7 +635,9 @@ details.panel[open] > summary { margin-bottom: 4px; }
 
 .rush-hud-slot { position: sticky; top: var(--header-height, 0px); z-index: 1; }
 .rush-hud { display: grid; gap: 10px; padding: 14px 18px; }
-.hud-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+/* Rows wrap on narrow phones instead of pushing the page wider than the screen. */
+.hud-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.hud-badges { display: flex; gap: 6px; }
 
 .hearts { display: flex; gap: 4px; font-size: 1.7rem; line-height: 1; }
 .heart { color: var(--red); text-shadow: 0 2px 0 var(--red-edge); }

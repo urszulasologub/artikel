@@ -189,3 +189,15 @@ test('starting at Hard skips to round 3 with a bonus that ends at the first mist
   await expect(rush(page).getByRole('button', { name: /^Hard/ })).toHaveAttribute('aria-pressed', 'true');
   app.expectNoErrors();
 });
+
+test('the score bar never makes the page wider than the screen', async ({ page }) => {
+  const app = await openRush(page);
+  await rush(page).getByRole('button', { name: /^Medium/ }).click();
+  await rush(page).getByRole('button', { name: 'Start' }).click();
+  await expect(rush(page).locator('.start-bonus-badge')).toBeVisible();
+  // Long score text and both badges at once, like a long game on a phone.
+  await rush(page).locator('.score-value').evaluate((node) => { node.textContent = '12345'; });
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+  app.expectNoErrors();
+});

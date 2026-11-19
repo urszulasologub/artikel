@@ -1,6 +1,21 @@
 # Artikel Trainer
 
 A small website for practising German articles (der/den/dem/des, ein/einen/einem/eines) in all four cases.
+Pick the case, then the article, and see why it's right. In English or Polish, on phone or computer.
+
+<p align="center">
+  <img src="docs/screenshots/practice.png" width="250" alt="Practice: a right answer, with the clue word's meaning and the translation">
+  <img src="docs/screenshots/rush.png" width="250" alt="Artikel Rush: hearts, score, start bonus, combo and the timer">
+  <img src="docs/screenshots/words.png" width="250" alt="Words: adding a word to your own set">
+</p>
+<p align="center">
+  <img src="docs/screenshots/learn.png" width="760" alt="Learn: how cases work and the article tables">
+</p>
+
+- **Practice:** sentences with a gap; choose the case first, then the article. Easy, Medium and Hard levels.
+- **Artikel Rush:** a game with rounds that get harder, hearts, combos, a timer and high scores.
+- **Learn:** a short guide to the four cases and the article tables.
+- **Words:** two built-in word sets, plus your own sets with CSV import and export.
 
 Plain HTML, CSS and JavaScript modules. No framework, no build step, no dependencies.
 
@@ -12,6 +27,7 @@ npm start        # serves on http://localhost:8000 (never cached, so edits show 
 npm test         # logic and data tests (fast, Node only)
 npm run test:e2e # browser tests: clicks through the app on desktop and phone sizes
 npm run test:all # both
+npm run screenshots # retakes the README screenshots (docs/screenshots/)
 ```
 
 Browser tests use the Google Chrome installed on your computer.
