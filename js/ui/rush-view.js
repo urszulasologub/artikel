@@ -290,7 +290,7 @@ export function mountRushView(root, { wordSets, storage }) {
 
     return el('section', { class: 'panel rush-start' },
       el('h2', {}, t('rush.title')),
-      el('p', { class: 'hint' }, t('rush.tagline')),
+      el('p', { class: 'hint' }, t('rush.tagline', { round: RULES.rounds.findIndex((round) => round.timer) + 1 })),
       el('ul', { class: 'rush-rules' }, t('rush.rules').map((rule) => el('li', {}, rule))),
       el('fieldset', { class: 'field' },
         el('legend', {}, t('rush.casesLabel', { min: RULES.minCases })),

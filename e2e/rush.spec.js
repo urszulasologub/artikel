@@ -113,14 +113,16 @@ async function answerRight(page) {
   await card.locator('.choice').filter({ hasText: new RegExp(`^${article}$`, 'i') }).click();
 }
 
-/** The right article, worked out from the case and gender shown on the card (der/die/das rounds). */
+/** The right article, worked out from the case and gender shown on the card, and the article kind on the buttons. */
 async function rightArticle(page) {
   const card = rush(page).locator('.rush-card');
+  const choices = await card.locator('.choice').allTextContents();
+  const articleType = choices.some((choice) => /^einen$/i.test(choice)) ? 'indefinite' : 'definite';
   const caseName = await card.locator('.case-tag').evaluate((tag) => tag.firstChild.textContent);
   const genderName = await card.locator('.hints .tag:not(.case-tag)').textContent();
   const grammarCase = Object.keys(CASE_NAMES).find((key) => CASE_NAMES[key] === caseName);
   const gender = { masculine: 'm', feminine: 'f', neuter: 'n', plural: 'pl' }[genderName.trim()];
-  return getArticle('definite', grammarCase, gender);
+  return getArticle(articleType, grammarCase, gender);
 }
 
 test('the score bar stays visible under the header while scrolling', async ({ page }) => {
@@ -164,13 +166,13 @@ test('a wrong case costs one heart at once, and a wrong article on the same ques
   app.expectNoErrors();
 });
 
-test('starting at Hard skips to round 4 with a bonus that ends at the first mistake', async ({ page }) => {
+test('starting at Hard skips to round 3 with a bonus that ends at the first mistake', async ({ page }) => {
   const app = await openRush(page);
   await rush(page).getByRole('button', { name: /^Hard/ }).click();
   await expect(rush(page).getByRole('button', { name: /^Hard/ })).toHaveAttribute('aria-pressed', 'true');
   await rush(page).getByRole('button', { name: 'Start' }).click();
 
-  await expect(rush(page).locator('.round-banner')).toContainText('Round 4');
+  await expect(rush(page).locator('.round-banner')).toContainText('Round 3');
   await expect(rush(page).locator('.start-bonus-badge')).toHaveText('Bonus ×1.5');
 
   // Answer until the first mistake; the bonus badge then goes away.

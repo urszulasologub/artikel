@@ -40,7 +40,7 @@ test('start levels point at real rounds with the same level, and harder starts p
   assert.equal(RULES.startLevels[0].round, 0);
 });
 
-test('round 3 has no grammar table at all; rounds 1 and 2 can open it', () => {
+test('from round 3 (Hard) there is no grammar table; rounds 1 and 2 can open it', () => {
   assert.equal(roundSettings(0, ['nom', 'akk']).tableMode, 'toggle');
   assert.equal(roundSettings(1, ['nom', 'akk']).tableMode, 'toggle');
   assert.equal(roundSettings(2, ['nom', 'akk']).tableMode, 'hidden');

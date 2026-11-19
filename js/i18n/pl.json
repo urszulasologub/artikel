@@ -124,7 +124,7 @@
   },
   "rush": {
     "title": "Artikel Rush",
-    "tagline": "Jak daleko zajdziesz? Każda runda jest trudniejsza, a od 6. rundy liczy się czas.",
+    "tagline": "Jak daleko zajdziesz? Każda runda jest trudniejsza, a od {round}. rundy liczy się czas.",
     "rules": [
       "Każda runda ma 10 pytań. Najpierw łatwo, potem trudniej.",
       "Masz 3 serca. Zły przypadek, zły rodzajnik albo koniec czasu zabiera jedno, ale najwyżej jedno na pytanie. Co 10 dobrych odpowiedzi jedno wraca.",
