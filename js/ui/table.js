@@ -1,10 +1,9 @@
 // Declension table: cases as rows, genders as columns.
 
 import { ARTICLE_TYPES, CASE_NAMES, CASE_QUESTIONS, GENDERS, getArticle } from '../grammar/articles.js';
+import { t } from '../i18n/index.js';
 import { el } from './dom.js';
 import { genderMark } from './marks.js';
-
-const COLUMN_TITLES = { m: 'masc.', f: 'fem.', n: 'neut.', pl: 'plural' };
 
 /**
  * @param {string} articleType
@@ -12,7 +11,7 @@ const COLUMN_TITLES = { m: 'masc.', f: 'fem.', n: 'neut.', pl: 'plural' };
  * @param {{ case: string, gender: string } | null} [highlight] cell to mark
  */
 export function declensionTable(articleType, cases, highlight = null) {
-  const header = el('tr', {}, el('th', {}, ''), GENDERS.map((g) => el('th', { class: `g-${g}` }, genderMark(g), COLUMN_TITLES[g])));
+  const header = el('tr', {}, el('th', {}, ''), GENDERS.map((g) => el('th', { class: `g-${g}` }, genderMark(g), t(`genderColumns.${g}`))));
 
   const rows = cases.map((grammarCase) =>
     el(

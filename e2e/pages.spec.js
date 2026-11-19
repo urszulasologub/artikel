@@ -1,4 +1,4 @@
-// Browser tests for navigation, the Learn tab, the Nouns tab and the sound button.
+// Browser tests for navigation, the Learn tab, the Words list and the sound button.
 
 import { expect, test } from '@playwright/test';
 
@@ -12,7 +12,7 @@ test('tabs switch between sections', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'How cases work' })).toBeVisible();
   await expect(page.locator('#view-practice')).toBeHidden();
 
-  await nav.getByRole('link', { name: 'Nouns' }).click();
+  await nav.getByRole('link', { name: 'Words' }).click();
   await expect(page.locator('.noun-item').first()).toBeVisible();
 
   await nav.getByRole('link', { name: 'Practice' }).click();
@@ -28,8 +28,8 @@ test('learn tab shows all four cases with their question words', async ({ page }
   app.expectNoErrors();
 });
 
-test('nouns tab: filter by gender and reveal hidden articles', async ({ page }) => {
-  const app = await openApp(page, 'nouns');
+test('words tab: filter by gender and reveal hidden articles', async ({ page }) => {
+  const app = await openApp(page, 'words');
 
   await page.getByRole('button', { name: 'die', exact: true }).click();
   const articles = page.locator('.noun-item .article');

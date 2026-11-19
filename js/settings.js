@@ -7,17 +7,18 @@ const STORAGE_KEY = 'german-grammar:settings';
 export const INPUT_MODES = ['choice', 'type'];
 export const TABLE_MODES = ['open', 'toggle', 'hidden'];
 
+// Preset names are in the i18n files under "presets".
 export const PRESETS = {
-  easy: { label: 'Easy', showGender: true, showCase: true, askCase: false, inputMode: 'choice', tableMode: 'toggle' },
-  medium: { label: 'Medium', showGender: true, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'toggle' },
-  mediumPlus: { label: 'Medium+', showGender: false, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'hidden' },
-  hard: { label: 'Hard', showGender: false, showCase: false, askCase: true, inputMode: 'type', tableMode: 'hidden' },
+  easy: { showGender: true, showCase: true, askCase: false, inputMode: 'choice', tableMode: 'toggle' },
+  medium: { showGender: true, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'toggle' },
+  mediumPlus: { showGender: false, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'hidden' },
+  hard: { showGender: false, showCase: false, askCase: true, inputMode: 'type', tableMode: 'hidden' },
 };
 
 const PRESET_FIELDS = ['showGender', 'showCase', 'askCase', 'inputMode', 'tableMode'];
 
 export const DEFAULT_SETTINGS = {
-  ...withoutLabel(PRESETS.easy),
+  ...PRESETS.easy,
   cases: ['nom', 'akk'],
   articleTypes: ['definite'],
 };
@@ -31,7 +32,7 @@ export function activePreset(settings) {
 }
 
 export function applyPreset(settings, presetId) {
-  return { ...settings, ...withoutLabel(PRESETS[presetId]) };
+  return { ...settings, ...PRESETS[presetId] };
 }
 
 export function loadSettings() {
@@ -68,8 +69,4 @@ export function sanitize(input) {
 
 function listOf(value, allowed) {
   return Array.isArray(value) ? allowed.filter((item) => value.includes(item)) : [];
-}
-
-function withoutLabel({ label, ...rest }) {
-  return rest;
 }

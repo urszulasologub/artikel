@@ -30,11 +30,14 @@ export function playSound(name) {
   for (const note of SOUNDS[name]) playNote(ctx, note);
 }
 
-/** Wires a button with aria-pressed="true" meaning sound is on. */
-export function mountSoundToggle(button) {
+/**
+ * Wires a button with aria-pressed="true" meaning sound is on.
+ * @param {{ on: string, off: string }} labels tooltips for both states
+ */
+export function mountSoundToggle(button, labels) {
   const sync = () => {
     button.setAttribute('aria-pressed', String(!muted));
-    button.title = muted ? 'Sound off' : 'Sound on';
+    button.title = muted ? labels.off : labels.on;
   };
   button.addEventListener('click', () => {
     muted = !muted;

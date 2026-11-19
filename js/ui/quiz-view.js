@@ -1,7 +1,9 @@
 // Practice tab: settings panel, question card and the optional grammar table.
 
-import { ARTICLE_TYPES, CASES, CASE_NAMES, CASE_QUESTIONS, GENDER_NAMES } from '../grammar/articles.js';
-import { checkAnswer, createQuestion, explain } from '../quiz/generator.js';
+import { ARTICLE_TYPES, CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
+import { language, t } from '../i18n/index.js';
+import { checkAnswer, createQuestion, explain, translateQuestion } from '../quiz/generator.js';
+import { nounMeaning } from '../quiz/translate.js';
 import { ROUND_LENGTH, createRound, nextRetryQuestion, recordAnswer, roundPhase, summarize } from '../quiz/round.js';
 import { loadProgress, saveProgress } from '../progress.js';
 import { PRESETS, activePreset, applyPreset, loadSettings, saveSettings } from '../settings.js';
@@ -9,10 +11,11 @@ import { el } from './dom.js';
 import { genderMark } from './marks.js';
 import { playSound } from './sound.js';
 import { declensionTable } from './table.js';
+import { setName } from './set-name.js';
 
 const STREAK_MILESTONE = 5;
 
-export function mountQuizView(root) {
+export function mountQuizView(root, { wordSets }) {
   const saved = loadProgress();
   const state = {
     settings: loadSettings(),
@@ -47,7 +50,8 @@ export function mountQuizView(root) {
   }
 
   function nextQuestion() {
-    showQuestion(createQuestion(state.settings, { previousKey: state.question?.key }));
+    const nouns = wordSets.activeSet().nouns;
+    showQuestion(createQuestion(state.settings, { previousKey: state.question?.key, nouns }));
   }
 
   function next() {
@@ -77,7 +81,7 @@ export function mountQuizView(root) {
   }
 
   function submit(answer) {
-    if (state.answered || awaitingCase(state) || !answer.trim()) return;
+    if (!state.question || state.answered || awaitingCase(state) || !answer.trim()) return;
     state.answered = true;
     state.userAnswer = answer.trim();
     state.articleCorrect = checkAnswer(state.question, answer);
@@ -107,10 +111,12 @@ export function mountQuizView(root) {
     settingsSlot.replaceChildren(renderSettings(state.settings, updateSettings, state.settingsOpen, (open) => {
       state.settingsOpen = open;
       writeSettingsOpen(open);
-    }));
-    cardSlot.replaceChildren(state.showSummary
-      ? renderSummary(state, newRound)
-      : renderCard(state, { submit, next, pickCase, newRound }));
+    }, wordSets));
+    let card;
+    if (state.showSummary) card = renderSummary(state, newRound);
+    else if (!state.question) card = renderEmptySet(wordSets.activeSet());
+    else card = renderCard(state, { submit, next, pickCase, newRound });
+    cardSlot.replaceChildren(card);
     tableSlot.replaceChildren(renderTable(state, () => {
       state.tableOpen = !state.tableOpen;
       render();
@@ -122,7 +128,7 @@ export function mountQuizView(root) {
 
   // Number keys pick a case or an article on desktop.
   document.addEventListener('keydown', (event) => {
-    if (root.hidden || state.answered || state.showSummary) return;
+    if (root.hidden || !state.question || state.answered || state.showSummary) return;
     if (event.target instanceof HTMLInputElement) return;
     const index = Number(event.key) - 1;
     if (awaitingCase(state)) {
@@ -139,6 +145,7 @@ export function mountQuizView(root) {
     if (!saved) return nextQuestion();
     state.question = saved.question;
     if (saved.showSummary) return render();
+    if (!saved.question) return nextQuestion();
     if (!saved.answered) return showQuestion(saved.question);
     // The shown answer was already counted, so move on to what comes after it.
     if (roundPhase(state.round) === 'done') {
@@ -148,21 +155,30 @@ export function mountQuizView(root) {
     return next();
   }
 
+  // Follow the Words tab: a different set (or the first word in an empty set) starts a new question.
+  let currentSetId = wordSets.activeSet().id;
+  wordSets.onChange(() => {
+    const switched = wordSets.activeSet().id !== currentSetId;
+    currentSetId = wordSets.activeSet().id;
+    if (!state.showSummary && (switched || !state.question)) nextQuestion();
+    else render();
+  });
+
   restore();
 }
 
-function renderSettings(settings, update, open, onToggle) {
+function renderSettings(settings, update, open, onToggle, wordSets) {
   const preset = activePreset(settings);
 
-  const presetButtons = Object.entries(PRESETS).map(([id, { label }]) =>
+  const presetButtons = Object.keys(PRESETS).map((id) =>
     el('button', {
       type: 'button',
       class: `segment${preset === id ? ' active' : ''}`,
       'aria-pressed': String(preset === id),
       onClick: () => update(applyPreset(settings, id), { newQuestion: true }),
-    }, label),
+    }, t(`presets.${id}`)),
   );
-  if (preset === 'custom') presetButtons.push(el('span', { class: 'segment active static' }, 'Custom'));
+  if (preset === 'custom') presetButtons.push(el('span', { class: 'segment active static' }, t('presets.custom')));
 
   const caseBoxes = CASES.map((grammarCase) =>
     checkbox([CASE_NAMES[grammarCase], el('span', { class: 'case-q' }, CASE_QUESTIONS[grammarCase])], settings.cases.includes(grammarCase), (checked) =>
@@ -182,27 +198,36 @@ function renderSettings(settings, update, open, onToggle) {
   return el(
     'details',
     { class: 'panel settings', open, onToggle: (event) => onToggle(event.target.open) },
-    el('summary', {}, 'Settings'),
-    field('Difficulty', el('div', { class: 'segments' }, presetButtons)),
-    field('Cases to practise', el('div', { class: 'checks' }, caseBoxes)),
-    field('Articles', el('div', { class: 'checks' }, articleBoxes)),
-    field('Details', el('div', { class: 'checks' },
-      checkbox('Show noun gender', settings.showGender, (checked) => update({ showGender: checked })),
-      // Showing the case would give away the answer to "Choose the case first".
-      checkbox('Show the case', settings.showCase && !settings.askCase, (checked) => update({ showCase: checked }), {
-        disabled: settings.askCase,
-        title: settings.askCase ? 'Hidden while "Choose the case first" is on' : null,
-      }),
-      checkbox('Choose the case first', settings.askCase, (checked) => update({ askCase: checked })),
+    el('summary', {}, t('settings.title')),
+    field(t('settings.difficulty'), el('div', { class: 'segments' }, presetButtons)),
+    field(t('settings.words'), el('div', { class: 'set-picker' },
+      el('select', {
+        'aria-label': t('settings.wordSet'),
+        onChange: (event) => wordSets.selectSet(event.target.value),
+      }, wordSets.listSets().map((set) =>
+        el('option', { value: set.id, selected: set.id === wordSets.activeSet().id },
+          `${setName(set)} (${set.nouns.length})`))),
+      el('a', { class: 'text-btn', href: '#words' }, t('settings.manage')),
     )),
-    field('Answer by', radios('inputMode', settings.inputMode, [
-      ['choice', 'Choosing'],
-      ['type', 'Typing'],
+    field(t('settings.cases'), el('div', { class: 'checks' }, caseBoxes)),
+    field(t('settings.articles'), el('div', { class: 'checks' }, articleBoxes)),
+    field(t('settings.details'), el('div', { class: 'checks' },
+      checkbox(t('settings.showGender'), settings.showGender, (checked) => update({ showGender: checked })),
+      // Showing the case would give away the answer to "Choose the case first".
+      checkbox(t('settings.showCase'), settings.showCase && !settings.askCase, (checked) => update({ showCase: checked }), {
+        disabled: settings.askCase,
+        title: settings.askCase ? t('settings.showCaseDisabled') : null,
+      }),
+      checkbox(t('settings.askCase'), settings.askCase, (checked) => update({ askCase: checked })),
+    )),
+    field(t('settings.answerBy'), radios('inputMode', settings.inputMode, [
+      ['choice', t('settings.choosing')],
+      ['type', t('settings.typing')],
     ], (value) => update({ inputMode: value }))),
-    field('Grammar table', radios('tableMode', settings.tableMode, [
-      ['open', 'Always open'],
-      ['toggle', 'Show / hide'],
-      ['hidden', 'Hidden'],
+    field(t('settings.table'), radios('tableMode', settings.tableMode, [
+      ['open', t('settings.tableOpen')],
+      ['toggle', t('settings.tableToggle')],
+      ['hidden', t('settings.tableHidden')],
     ], (value) => update({ tableMode: value }))),
   );
 }
@@ -239,8 +264,8 @@ function renderCard(state, { submit, next, pickCase, newRound }) {
     caseKnown && el('span', { class: `tag case-tag c-${question.case}` },
       CASE_NAMES[question.case], el('span', { class: 'case-q' }, CASE_QUESTIONS[question.case])),
     settings.showGender && el('span', { class: `tag g-${question.gender}` },
-      genderMark(question.gender), GENDER_NAMES[question.gender]),
-    el('span', { class: 'meaning' }, `${question.noun.en}${question.plural ? ' (plural)' : ''}`),
+      genderMark(question.gender), t(`genders.${question.gender}`)),
+    renderMeaning(question),
   ];
 
   return el(
@@ -248,10 +273,10 @@ function renderCard(state, { submit, next, pickCase, newRound }) {
     { class: 'panel card', 'aria-live': 'polite' },
     renderProgress(state, newRound),
     el('p', { class: 'sentence' }, question.before, gap, ' ', el('span', { class: nounClass }, question.nounText), question.after),
-    answered && el('p', { class: 'translation' }, question.translation),
+    answered && renderTranslation(question, 'p'),
     el('div', { class: 'hints' }, hints),
     asking && renderCaseStep(state, pickCase),
-    !waiting && asking && el('p', { class: 'step-label' }, 'Now pick the article'),
+    !waiting && asking && el('p', { class: 'step-label' }, t('quiz.pickArticle')),
     !waiting && (settings.inputMode === 'choice' ? renderChoices(state, submit) : renderTyping(state, submit)),
     answered && renderFeedback(state),
     answered && el('button', { type: 'button', class: `btn primary next${correct ? '' : ' danger'}`, onClick: next },
@@ -261,9 +286,17 @@ function renderCard(state, { submit, next, pickCase, newRound }) {
 
 function nextButtonLabel(round) {
   const phase = roundPhase(round);
-  if (phase === 'done') return 'See results';
-  if (phase === 'retry' && round.retryResults.length === 0) return 'Retry mistakes';
-  return 'Continue';
+  if (phase === 'done') return t('quiz.seeResults');
+  if (phase === 'retry' && round.retryResults.length === 0) return t('quiz.retryMistakes');
+  return t('quiz.continue');
+}
+
+function renderEmptySet(set) {
+  return el('section', { class: 'panel card empty-set' },
+    el('h3', {}, t('quiz.emptyTitle', { name: setName(set) })),
+    el('p', {}, t('quiz.emptyText')),
+    el('a', { class: 'btn primary', href: '#words' }, t('quiz.addWords')),
+  );
 }
 
 function renderProgress({ round, answered, streak, justAnswered }, newRound) {
@@ -290,19 +323,20 @@ function renderProgress({ round, answered, streak, justAnswered }, newRound) {
       'aria-valuemin': '0',
       'aria-valuemax': String(length),
       'aria-valuenow': String(results.length),
-      'aria-label': `${retrying ? 'Retry' : 'Question'} ${position} of ${length}`,
+      'aria-label': t(retrying ? 'quiz.retry' : 'quiz.question', { position, total: length }),
     }, segments),
-    streak > 1 && el('span', { class: `streak${hot}${bump}`, title: `${streak} correct in a row` },
-      el('span', { class: 'streak-count' }, streak), 'in a row'),
+    streak > 1 && el('span', { class: `streak${hot}${bump}`, title: t('quiz.streakTitle', { count: streak }) },
+      el('span', { class: 'streak-count' }, streak), t('quiz.inARow')),
   );
   const label = retrying
-    ? el('p', { class: 'retry-banner' }, el('strong', {}, 'Second chance'), ` · mistake ${position} of ${length}`)
-    : el('p', { class: 'retry-banner' }, `Question ${position} of ${length}`);
+    ? el('p', { class: 'retry-banner' }, el('strong', {}, t('quiz.secondChance')),
+      ` · ${t('quiz.mistake', { position, total: length })}`)
+    : el('p', { class: 'retry-banner' }, t('quiz.question', { position, total: length }));
   return el('div', {},
     el('div', { class: 'card-top' },
       label,
-      el('button', { type: 'button', class: 'text-btn', onClick: newRound, title: 'Abandon this quiz and start a new one' },
-        '↺ New quiz'),
+      el('button', { type: 'button', class: 'text-btn', onClick: newRound, title: t('quiz.newQuizTitle') },
+        t('quiz.newQuiz')),
     ),
     row,
   );
@@ -311,28 +345,30 @@ function renderProgress({ round, answered, streak, justAnswered }, newRound) {
 function renderSummary({ round }, newRound) {
   const { correct, total, mistakes, fixed, stillWrong, weakSpot } = summarize(round);
   const ratio = correct / total;
-  let message = 'Keep going, it gets easier.';
-  if (ratio === 1) message = 'Perfekt! Not a single mistake.';
-  else if (ratio >= 0.8) message = 'Sehr gut! Almost there.';
-  else if (ratio >= 0.5) message = 'Gut gemacht. Solid progress.';
+  let message = t('summary.keepGoing');
+  if (ratio === 1) message = t('summary.perfect');
+  else if (ratio >= 0.8) message = t('summary.great');
+  else if (ratio >= 0.5) message = t('summary.good');
 
   return el('section', { class: 'panel card summary', 'aria-live': 'polite' },
     el('p', { class: 'summary-score' }, el('strong', {}, correct), ` / ${total}`),
     el('p', { class: 'summary-message' }, message),
     mistakes.length > 0 && el('p', { class: 'fixed' },
       fixed === mistakes.length
-        ? `You fixed all ${mistakes.length} on the second try.`
-        : `Fixed on the second try: ${fixed} of ${mistakes.length}.`),
+        ? t('summary.fixedAll', { count: fixed })
+        : t('summary.fixedSome', { fixed, total: mistakes.length })),
     weakSpot && el('p', { class: 'weak-spot' },
-      'Your weak spot: ', genderMark(weakSpot.gender), ' ', el('strong', { class: `case-text c-${weakSpot.case}` }, weakSpot.label)),
+      `${t('summary.weakSpot')} `, genderMark(weakSpot.gender), ' ',
+      el('strong', { class: `case-text c-${weakSpot.case}` },
+        t('summary.weakSpotLabel', { case: CASE_NAMES[weakSpot.case], gender: t(`genders.${weakSpot.gender}`) }))),
     stillWrong.length > 0 && el('div', { class: 'review' },
-      el('h3', {}, 'Still to practise'),
+      el('h3', {}, t('summary.stillToPractise')),
       el('ul', {}, stillWrong.map((q) => el('li', { class: `c-${q.case}` },
         q.before, el('strong', { class: `g-${q.gender}` }, q.answer), ' ', q.nounText, q.after,
-        el('span', { class: 'translation' }, q.translation),
+        renderTranslation(q, 'span'),
       ))),
     ),
-    el('button', { type: 'button', class: 'btn primary next', onClick: newRound }, 'New round'),
+    el('button', { type: 'button', class: 'btn primary next', onClick: newRound }, t('summary.newRound')),
   );
 }
 
@@ -345,7 +381,7 @@ function renderChoices({ question, answered, userAnswer }, submit) {
       type: 'button',
       class: `btn choice${status}`,
       disabled: answered,
-      title: `Key ${index + 1}`,
+      title: t('quiz.key', { n: index + 1 }),
       onClick: () => submit(choice),
     }, choice);
   }));
@@ -357,11 +393,11 @@ function renderTyping({ answered, userAnswer, correct }, submit) {
     class: `answer-input${answered ? (correct ? ' ok' : ' bad') : ''}`,
     value: userAnswer,
     disabled: answered,
-    placeholder: 'Type the article',
+    placeholder: t('quiz.typePlaceholder'),
     autocomplete: 'off',
     autocapitalize: 'off',
     spellcheck: false,
-    'aria-label': 'Your answer',
+    'aria-label': t('quiz.yourAnswer'),
   });
   return el('form', {
     class: 'type-form',
@@ -369,7 +405,7 @@ function renderTyping({ answered, userAnswer, correct }, submit) {
       event.preventDefault();
       submit(input.value);
     },
-  }, input, !answered && el('button', { type: 'submit', class: 'btn primary' }, 'Check'));
+  }, input, !answered && el('button', { type: 'submit', class: 'btn primary' }, t('quiz.check')));
 }
 
 function renderCaseStep(state, pickCase) {
@@ -383,30 +419,40 @@ function renderCaseStep(state, pickCase) {
       type: 'button',
       class: `btn case-choice c-${grammarCase}${status}`,
       disabled: caseAnswer !== null,
-      title: `Key ${index + 1}`,
+      title: t('quiz.key', { n: index + 1 }),
       onClick: () => pickCase(grammarCase),
     }, CASE_NAMES[grammarCase], el('span', { class: 'case-q' }, CASE_QUESTIONS[grammarCase]));
   });
   return el('div', { class: 'step' },
-    el('p', { class: 'step-label' }, 'Which case is it?'),
+    el('p', { class: 'step-label' }, t('quiz.whichCase')),
     el('div', { class: 'case-choices' }, buttons),
   );
 }
 
 function feedbackTitle({ question, correct, caseCorrect, articleCorrect }) {
-  const article = `"${question.answer}"`;
-  const grammarCase = CASE_NAMES[question.case];
-  if (correct) return 'Correct!';
-  if (!caseCorrect && articleCorrect) return `Right article, but the case is ${grammarCase}.`;
-  if (!caseCorrect) return `Not quite. It's ${grammarCase}, so the answer is ${article}.`;
-  return `Not quite. The answer is ${article}.`;
+  const params = { answer: question.answer, case: CASE_NAMES[question.case] };
+  if (correct) return t('feedback.correct');
+  if (!caseCorrect && articleCorrect) return t('feedback.wrongCaseRightArticle', params);
+  if (!caseCorrect) return t('feedback.wrongCase', params);
+  return t('feedback.wrong', params);
+}
+
+/** The sentence in the interface language. Words without a translation (user-added) show none. */
+function renderTranslation(question, tag) {
+  const translation = translateQuestion(question, language);
+  return translation && el(tag, { class: 'translation' }, translation);
+}
+
+function renderMeaning(question) {
+  const meaning = nounMeaning(question.noun, language);
+  return meaning && el('span', { class: 'meaning' }, `${meaning}${question.plural ? ` (${t('quiz.plural')})` : ''}`);
 }
 
 function renderFeedback(state) {
   const { question, correct } = state;
   return el('div', { class: `feedback ${correct ? 'ok' : 'bad'}` },
     el('strong', {}, feedbackTitle(state)),
-    el('p', {}, explain(question)),
+    el('p', {}, explain(question, t)),
   );
 }
 
@@ -420,7 +466,7 @@ function renderTable({ settings, question, answered, tableOpen }, toggle) {
   return el('section', { class: 'panel' },
     settings.tableMode === 'toggle' &&
       el('button', { type: 'button', class: 'btn', 'aria-expanded': String(visible), onClick: toggle },
-        visible ? 'Hide table' : 'Show table'),
+        visible ? t('quiz.hideTable') : t('quiz.showTable')),
     visible && el('div', { class: 'tables' }, tables),
   );
 }

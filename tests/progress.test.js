@@ -13,16 +13,16 @@ beforeEach(() => {
 });
 
 const progress = {
-  round: { results: [{ question: { answer: 'den' }, correct: true }], retryResults: [] },
+  round: { results: [{ question: { answer: 'den', sentenceId: 'akk-see' }, correct: true }], retryResults: [] },
   streak: 1,
-  question: { answer: 'dem', case: 'dat' },
+  question: { answer: 'dem', case: 'dat', sentenceId: 'dat-help' },
   answered: false,
   showSummary: false,
 };
 
 test('saved progress loads back', () => {
   saveProgress(progress);
-  assert.deepEqual(loadProgress(), { version: 1, ...progress });
+  assert.deepEqual(loadProgress(), { version: 2, ...progress });
 });
 
 test('nothing saved gives null', () => {
@@ -32,8 +32,8 @@ test('nothing saved gives null', () => {
 test('broken or old saves are ignored', () => {
   localStorage.setItem('german-grammar:progress', '{not json');
   assert.equal(loadProgress(), null);
-  localStorage.setItem('german-grammar:progress', JSON.stringify({ ...progress, version: 0 }));
+  localStorage.setItem('german-grammar:progress', JSON.stringify({ ...progress, version: 1 }));
   assert.equal(loadProgress(), null);
-  localStorage.setItem('german-grammar:progress', JSON.stringify({ version: 1, streak: 2 }));
+  localStorage.setItem('german-grammar:progress', JSON.stringify({ version: 2, streak: 2 }));
   assert.equal(loadProgress(), null);
 });

@@ -1,4 +1,5 @@
 // Noun list. `genitive` is the singular Genitiv form (only used for m/n).
+// Gender 'pl' marks plural-only words (die Eltern); their `plural` is the word itself.
 // `en` is shown as a hint; its first meaning (without notes in brackets) is used in translations.
 // Tags decide which sentences a noun fits into:
 //   person, animal, object (small things you can hold), place (furniture, buildings, vehicles).
@@ -19,6 +20,9 @@ export const NOUNS = [
   { word: 'Mädchen', gender: 'n', plural: 'Mädchen', genitive: 'Mädchens', en: 'girl', enPlural: 'girls', tags: ['person'] },
   { word: 'Arzt', gender: 'm', plural: 'Ärzte', genitive: 'Arztes', en: 'doctor', enPlural: 'doctors', tags: ['person'] },
   { word: 'Baby', gender: 'n', plural: 'Babys', genitive: 'Babys', en: 'baby', enPlural: 'babies', tags: ['person'] },
+  { word: 'Eltern', gender: 'pl', plural: 'Eltern', genitive: 'Eltern', en: 'parents', enPlural: 'parents', tags: ['person'] },
+  { word: 'Leute', gender: 'pl', plural: 'Leute', genitive: 'Leute', en: 'people', enPlural: 'people', tags: ['person'] },
+  { word: 'Geschwister', gender: 'pl', plural: 'Geschwister', genitive: 'Geschwister', en: 'siblings', enPlural: 'siblings', tags: ['person'] },
 
   // Animals
   { word: 'Hund', gender: 'm', plural: 'Hunde', genitive: 'Hundes', en: 'dog', enPlural: 'dogs', tags: ['animal'] },

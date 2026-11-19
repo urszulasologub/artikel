@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { NOUNS } from '../js/data/nouns.js';
+import { POLISH_NOUNS } from '../js/data/nouns-pl.js';
 import { SENTENCES } from '../js/data/sentences.js';
 import { CASES } from '../js/grammar/articles.js';
 import { GAP, fillTemplate, matchingNouns } from '../js/quiz/generator.js';
@@ -13,7 +14,8 @@ const TAGS = ['person', 'animal', 'object', 'place'];
 test('nouns are well formed and unique', () => {
   const seen = new Set();
   for (const noun of NOUNS) {
-    assert.ok(['m', 'f', 'n'].includes(noun.gender), `${noun.word}: gender`);
+    assert.ok(['m', 'f', 'n', 'pl'].includes(noun.gender), `${noun.word}: gender`);
+    if (noun.gender === 'pl') assert.equal(noun.plural, noun.word, `${noun.word}: plural-only words are their own plural`);
     for (const field of ['word', 'plural', 'genitive', 'en']) {
       assert.equal(typeof noun[field], 'string', `${noun.word}: ${field}`);
     }
@@ -29,7 +31,7 @@ test('every sentence has one gap and matching nouns', () => {
     assert.equal(sentence.text.split(GAP).length, 2, `${sentence.text}: needs exactly one "${GAP}"`);
     assert.ok(sentence.tags.every((t) => TAGS.includes(t)), `${sentence.text}: tags`);
     assert.ok(matchingNouns(sentence).length > 0, `${sentence.text}: no nouns fit`);
-    assert.ok(sentence.reason, `${sentence.text}: reason`);
+    assert.ok(sentence.id && sentence.why?.rule, `${sentence.text}: id and why`);
 
     for (const plural of [false, true]) {
       const { before, after } = fillTemplate(sentence.text, plural);
@@ -53,4 +55,31 @@ test('every sentence has an English translation with one noun slot', () => {
 
 test('every noun has an English plural', () => {
   for (const noun of NOUNS) assert.equal(typeof noun.enPlural, 'string', `${noun.word}: enPlural`);
+});
+
+test('every kind of noun has a sentence in every case, so any word set works', () => {
+  for (const tag of TAGS) {
+    for (const grammarCase of CASES) {
+      assert.ok(
+        SENTENCES.some((s) => s.case === grammarCase && s.tags.includes(tag)),
+        `no ${grammarCase} sentence for "${tag}" nouns`,
+      );
+    }
+  }
+});
+
+test('every sentence has a Polish translation with one noun slot', () => {
+  for (const sentence of SENTENCES) {
+    const slots = (sentence.pl ?? '').match(/\{(nom|gen|dat|acc|inst)\}/g) ?? [];
+    assert.equal(slots.length, 1, `${sentence.id}: pl needs exactly one Polish case slot`);
+  }
+});
+
+test('every built-in noun has the Polish forms it needs', () => {
+  for (const noun of NOUNS) {
+    const polish = POLISH_NOUNS[noun.word];
+    assert.ok(polish, `${noun.word}: no Polish forms`);
+    if (noun.gender !== 'pl') assert.equal(polish.sg?.length, 5, `${noun.word}: Polish singular forms`);
+    if (noun.plural) assert.equal(polish.pl?.length, 5, `${noun.word}: Polish plural forms`);
+  }
 });

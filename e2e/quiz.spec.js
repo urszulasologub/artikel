@@ -278,6 +278,8 @@ test('the settings panel stays closed after a refresh', async ({ page }) => {
   const app = await openApp(page);
   await page.locator('details.settings summary').click();
   await expect(page.locator('details.settings')).not.toHaveAttribute('open', '');
+  // The browser reports the toggle a moment after the click; wait until it is saved.
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('german-grammar:settings-open'))).toBe('0');
   await page.reload();
   await expect(page.locator('details.settings')).not.toHaveAttribute('open', '');
   await expect(page.getByRole('button', { name: 'Easy', exact: true })).toBeHidden();

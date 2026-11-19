@@ -2,7 +2,7 @@
 
 const STORAGE_KEY = 'german-grammar:progress';
 // Bump when the saved shape changes; older saves are then ignored instead of breaking the quiz.
-const VERSION = 1;
+const VERSION = 2;
 
 /** @returns {{ round, streak, question, answered, showSummary } | null} */
 export function loadProgress() {
@@ -28,7 +28,8 @@ function isValid(data) {
     Array.isArray(data.round?.results) &&
     Array.isArray(data.round?.retryResults) &&
     Number.isInteger(data.streak) &&
-    typeof data.question?.answer === 'string' &&
+    // The question is null while the chosen word set is empty.
+    (data.question === null || typeof data.question?.sentenceId === 'string') &&
     typeof data.answered === 'boolean' &&
     typeof data.showSummary === 'boolean'
   );

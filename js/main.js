@@ -1,19 +1,27 @@
-// Entry point: mounts the three tabs and the sound toggle, and switches between them using the URL hash.
+// Entry point: applies the interface language, mounts the three tabs, the sound and language buttons,
+// and switches between tabs using the URL hash.
 
-import { mountNounsView } from './ui/nouns-view.js';
+import { LANGUAGES, language, setLanguage, t } from './i18n/index.js';
 import { mountQuizView } from './ui/quiz-view.js';
 import { mountSoundToggle } from './ui/sound.js';
 import { mountTutorialView } from './ui/tutorial-view.js';
+import { mountWordsView } from './ui/words-view.js';
+import { createWordSetStore } from './words/store.js';
 
 const VIEWS = {
   practice: mountQuizView,
   learn: mountTutorialView,
-  nouns: mountNounsView,
+  words: mountWordsView,
 };
 const DEFAULT_VIEW = 'practice';
 
+translateStaticText();
+
+// One shared store, so the Practice tab follows changes made in the Words tab.
+const wordSets = createWordSetStore(browserStorage());
+
 for (const [id, mount] of Object.entries(VIEWS)) {
-  mount(document.getElementById(`view-${id}`));
+  mount(document.getElementById(`view-${id}`), { wordSets });
 }
 
 function showView() {
@@ -27,7 +35,41 @@ function showView() {
   }
 }
 
-mountSoundToggle(document.getElementById('sound-toggle'));
+mountSoundToggle(document.getElementById('sound-toggle'), { on: t('app.soundOn'), off: t('app.soundOff') });
+mountLanguageSwitch(document.querySelector('.lang-switch'));
 
 window.addEventListener('hashchange', showView);
 showView();
+
+// Texts written in index.html: marked with data-i18n (text) or data-i18n-aria-label.
+function translateStaticText() {
+  document.documentElement.lang = language;
+  document.title = t('app.title');
+  document.querySelector('meta[name="description"]')?.setAttribute('content', t('app.description'));
+  for (const node of document.querySelectorAll('[data-i18n]')) node.textContent = t(node.dataset.i18n);
+  for (const node of document.querySelectorAll('[data-i18n-aria-label]')) {
+    node.setAttribute('aria-label', t(node.dataset.i18nAriaLabel));
+  }
+}
+
+// Switching reloads the page, so every view is drawn again in the new language. The quiz continues
+// where it was, because progress is saved.
+function mountLanguageSwitch(group) {
+  for (const button of group.querySelectorAll('[data-lang]')) {
+    const code = button.dataset.lang;
+    button.setAttribute('aria-pressed', String(code === language));
+    button.addEventListener('click', () => {
+      if (code === language || !Object.hasOwn(LANGUAGES, code)) return;
+      setLanguage(code);
+      location.reload();
+    });
+  }
+}
+
+function browserStorage() {
+  try {
+    return window.localStorage;
+  } catch {
+    return null; // Blocked storage: word sets then last for this visit only.
+  }
+}

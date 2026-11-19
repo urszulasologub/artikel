@@ -27,27 +27,33 @@
           </span>
           Artikel
         </a>
-        <button id="sound-toggle" class="icon-btn" type="button" aria-label="Sound" aria-pressed="true">
-          <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 9h4l5-4v14l-5-4H4z" />
-            <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" />
-          </svg>
-          <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 9h4l5-4v14l-5-4H4z" />
-            <path d="M17 9l5 6M22 9l-5 6" fill="none" />
-          </svg>
-        </button>
+        <div class="top-actions">
+          <div class="lang-switch" role="group" aria-label="Language" data-i18n-aria-label="app.language">
+            <button type="button" data-lang="en">EN</button>
+            <button type="button" data-lang="pl">PL</button>
+          </div>
+          <button id="sound-toggle" class="icon-btn" type="button" aria-label="Sound" data-i18n-aria-label="app.sound" aria-pressed="true">
+            <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9h4l5-4v14l-5-4H4z" />
+              <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" />
+            </svg>
+            <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9h4l5-4v14l-5-4H4z" />
+              <path d="M17 9l5 6M22 9l-5 6" fill="none" />
+            </svg>
+          </button>
+        </div>
       </div>
-      <nav class="tabs" aria-label="Sections">
-        <a href="#practice" data-tab="practice">Practice</a>
-        <a href="#learn" data-tab="learn">Learn</a>
-        <a href="#nouns" data-tab="nouns">Nouns</a>
+      <nav class="tabs" aria-label="Sections" data-i18n-aria-label="app.sections">
+        <a href="#practice" data-tab="practice" data-i18n="app.tabs.practice">Practice</a>
+        <a href="#learn" data-tab="learn" data-i18n="app.tabs.learn">Learn</a>
+        <a href="#words" data-tab="words" data-i18n="app.tabs.words">Words</a>
       </nav>
     </header>
     <main>
       <div id="view-practice"></div>
       <div id="view-learn" hidden></div>
-      <div id="view-nouns" hidden></div>
+      <div id="view-words" hidden></div>
     </main>
   </body>
 </html>

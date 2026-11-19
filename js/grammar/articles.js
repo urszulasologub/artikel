@@ -19,13 +19,6 @@ export const CASE_QUESTIONS = {
 
 export const GENDERS = ['m', 'f', 'n', 'pl'];
 
-export const GENDER_NAMES = {
-  m: 'masculine',
-  f: 'feminine',
-  n: 'neuter',
-  pl: 'plural',
-};
-
 // `null` means the form does not exist (there is no plural of "ein").
 export const ARTICLE_TYPES = {
   definite: {

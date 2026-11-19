@@ -1,0 +1,223 @@
+{
+  "app": {
+    "title": "Artikel Trainer",
+    "description": "Ćwicz niemieckie rodzajniki we wszystkich czterech przypadkach.",
+    "tabs": { "practice": "Ćwiczenia", "learn": "Nauka", "words": "Słówka" },
+    "sections": "Sekcje",
+    "language": "Język",
+    "sound": "Dźwięk",
+    "soundOn": "Dźwięk włączony",
+    "soundOff": "Dźwięk wyłączony"
+  },
+  "genders": { "m": "rodzaj męski", "f": "rodzaj żeński", "n": "rodzaj nijaki", "pl": "liczba mnoga" },
+  "genderColumns": { "m": "męski", "f": "żeński", "n": "nijaki", "pl": "l. mnoga" },
+  "presets": { "easy": "Łatwy", "medium": "Średni", "mediumPlus": "Średni+", "hard": "Trudny", "custom": "Własny" },
+  "settings": {
+    "title": "Ustawienia",
+    "difficulty": "Poziom",
+    "words": "Słówka",
+    "wordSet": "Zestaw słówek",
+    "manage": "Zarządzaj",
+    "cases": "Przypadki do ćwiczenia",
+    "articles": "Rodzajniki",
+    "details": "Szczegóły",
+    "showGender": "Pokazuj rodzaj rzeczownika",
+    "showCase": "Pokazuj przypadek",
+    "showCaseDisabled": "Ukryte, gdy włączone jest „Najpierw wybierz przypadek”",
+    "askCase": "Najpierw wybierz przypadek",
+    "answerBy": "Odpowiadanie",
+    "choosing": "Wybór",
+    "typing": "Pisanie",
+    "table": "Tabela gramatyczna",
+    "tableOpen": "Zawsze otwarta",
+    "tableToggle": "Pokaż / ukryj",
+    "tableHidden": "Ukryta"
+  },
+  "quiz": {
+    "question": "Pytanie {position} z {total}",
+    "secondChance": "Druga szansa",
+    "mistake": "błąd {position} z {total}",
+    "retry": "Powtórka {position} z {total}",
+    "newQuiz": "↺ Nowy quiz",
+    "newQuizTitle": "Porzuć ten quiz i zacznij nowy",
+    "inARow": "z rzędu",
+    "streakTitle": {
+      "one": "{count} dobra odpowiedź z rzędu",
+      "few": "{count} dobre odpowiedzi z rzędu",
+      "many": "{count} dobrych odpowiedzi z rzędu",
+      "other": "{count} dobrych odpowiedzi z rzędu"
+    },
+    "plural": "liczba mnoga",
+    "whichCase": "Jaki to przypadek?",
+    "pickArticle": "Teraz wybierz rodzajnik",
+    "key": "Klawisz {n}",
+    "typePlaceholder": "Wpisz rodzajnik",
+    "yourAnswer": "Twoja odpowiedź",
+    "check": "Sprawdź",
+    "continue": "Dalej",
+    "retryMistakes": "Popraw błędy",
+    "seeResults": "Zobacz wynik",
+    "hideTable": "Ukryj tabelę",
+    "showTable": "Pokaż tabelę",
+    "emptyTitle": "Zestaw „{name}” nie ma jeszcze słówek",
+    "emptyText": "Dodaj słówka w zakładce Słówka albo wybierz inny zestaw w Ustawieniach.",
+    "addWords": "Dodaj słówka"
+  },
+  "feedback": {
+    "correct": "Dobrze!",
+    "wrongCaseRightArticle": "Dobry rodzajnik, ale to jest {case}.",
+    "wrongCase": "Nie całkiem. To {case}, więc odpowiedź to „{answer}”.",
+    "wrong": "Nie całkiem. Odpowiedź to „{answer}”."
+  },
+  "explain": {
+    "sentence": "{case}: {reason} {noun}, więc odpowiedź to „{answer}”.",
+    "gender": "„{word}” to {gender} ({article} {word})",
+    "plural": "„{plural}” to liczba mnoga",
+    "pluralOnly": "„{word}” występuje tylko w liczbie mnogiej"
+  },
+  "why": {
+    "subject": "Rzeczownik jest podmiotem zdania.",
+    "subjectAfterVerb": "Rzeczownik jest podmiotem, choć stoi po czasowniku.",
+    "verbAkk": "„{word}” łączy się z dopełnieniem bliższym.",
+    "verbDat": "„{word}” zawsze łączy się z Dativem.",
+    "prepAkk": "Po „{word}” zawsze jest Akkusativ.",
+    "prepDat": "Po „{word}” zawsze jest Dativ.",
+    "twoWayDat": "„{word}” + miejsce (wo?) to Dativ.",
+    "possession": "Przynależność: czyje to jest?",
+    "prepGen": "Po „{word}” jest Genitiv."
+  },
+  "summary": {
+    "perfect": "Perfekt! Ani jednego błędu.",
+    "great": "Sehr gut! Prawie idealnie.",
+    "good": "Gut gemacht. Dobry postęp.",
+    "keepGoing": "Ćwicz dalej, będzie coraz łatwiej.",
+    "fixedAll": {
+      "one": "Poprawiono przy drugiej próbie.",
+      "few": "Wszystkie {count} poprawione przy drugiej próbie.",
+      "many": "Wszystkie {count} poprawione przy drugiej próbie.",
+      "other": "Wszystkie {count} poprawione przy drugiej próbie."
+    },
+    "fixedSome": "Poprawione przy drugiej próbie: {fixed} z {total}.",
+    "weakSpot": "Twój słaby punkt:",
+    "weakSpotLabel": "{case}, {gender}",
+    "stillToPractise": "Do powtórki",
+    "newRound": "Nowa runda"
+  },
+  "learn": {
+    "title": "Jak działają przypadki",
+    "intro": "W niemieckim rodzajnik zmienia się zależnie od roli rzeczownika w zdaniu. Ta rola to przypadek. Zadaj pytanie przypadku, żeby go znaleźć, a potem odczytaj rodzajnik z tabeli.",
+    "steps": [
+      "Ustal rodzaj rzeczownika: der, die, das albo liczba mnoga.",
+      "Ustal przypadek: czy jakiś czasownik lub przyimek go wymusza? Jeśli nie, czy rzeczownik jest podmiotem, czy dopełnieniem?",
+      "Odczytaj rodzajnik na przecięciu wiersza przypadku i kolumny rodzaju."
+    ],
+    "tablesTitle": "Tabele rodzajników",
+    "cases": {
+      "nom": {
+        "meaning": "kto? co?",
+        "use": "Podmiot: osoba lub rzecz, która wykonuje czynność. Także po „sein” (być).",
+        "triggers": ["Podmiot zdania", "po sein, werden, bleiben"],
+        "tip": "To forma, którą znajdziesz w słowniku."
+      },
+      "akk": {
+        "meaning": "kogo? co?",
+        "use": "Dopełnienie bliższe: osoba lub rzecz, na którą skierowana jest czynność.",
+        "triggers": [
+          "Czasowniki: haben, sehen, kaufen, brauchen, suchen, lieben, fragen, besuchen",
+          "Przyimki: durch, für, gegen, ohne, um",
+          "Przyimki dwukierunkowe (in, an, auf…), gdy jest ruch: wohin?"
+        ],
+        "tip": "Zmienia się tylko rodzaj męski: der → den, ein → einen."
+      },
+      "dat": {
+        "meaning": "komu? czemu?",
+        "use": "Dopełnienie dalsze: komu coś dajemy lub dla kogo coś robimy. Także po niektórych czasownikach i przyimkach.",
+        "triggers": [
+          "Czasowniki: helfen, danken, gehören, gefallen, antworten",
+          "Przyimki: aus, bei, mit, nach, seit, von, zu",
+          "Przyimki dwukierunkowe (in, an, auf, neben, vor, unter…) dla miejsca: wo?"
+        ],
+        "tip": "Rzeczowniki w liczbie mnogiej dostają -n: den Kindern (chyba że już kończą się na -n lub -s)."
+      },
+      "gen": {
+        "meaning": "czyj? czyja? czyje?",
+        "use": "Przynależność: do kogo coś należy. Także po niektórych przyimkach.",
+        "triggers": ["Przynależność: das Auto des Mannes", "Przyimki: wegen, trotz, während, statt"],
+        "tip": "Rzeczowniki rodzaju męskiego i nijakiego dostają -s lub -es: des Mannes, des Kindes."
+      }
+    }
+  },
+  "kinds": { "thing": "Rzecz", "person": "Osoba", "animal": "Zwierzę", "place": "Miejsce, mebel lub pojazd" },
+  "words": {
+    "title": "Zestawy słówek",
+    "builtInNames": { "basics": "Podstawy" },
+    "practiseWith": "Ćwicz z zestawem",
+    "builtIn": "{name} (wbudowany)",
+    "count": { "one": "{count} słówko", "few": "{count} słówka", "many": "{count} słówek", "other": "{count} słówka" },
+    "builtInHint": "Tego wbudowanego zestawu nie można zmieniać. Skopiuj go, żeby dodawać lub usuwać słówka.",
+    "name": "Nazwa",
+    "newSet": "Nowy pusty zestaw",
+    "defaultSetName": "Moje słówka",
+    "copySuffix": "(kopia)",
+    "copySet": "Skopiuj ten zestaw",
+    "exportCsv": "Eksportuj CSV",
+    "importCsv": "Importuj CSV",
+    "deleteSet": "Usuń zestaw",
+    "csvFormat": "Format CSV",
+    "csvHelp": "Jedno słówko w wierszu. Wymagane są tylko word i gender; pozostałe kolumny są opcjonalne. Gender to der, die, das albo plural. Kind to thing, person, animal albo place. Działa przecinek lub średnik.",
+    "addTitle": "Dodaj słówko",
+    "germanWord": "Słowo po niemiecku",
+    "wordPlaceholder": "np. Hund albo der Hund",
+    "gender": "Rodzaj",
+    "pluralOnly": "tylko l. mnoga",
+    "kind": "Rodzaj rzeczy",
+    "pluralField": "Liczba mnoga (opcjonalnie)",
+    "pluralPlaceholder": "np. Hunde",
+    "meaningField": "Znaczenie (opcjonalnie)",
+    "meaningPlaceholder": "np. pies",
+    "moreForms": "Więcej form",
+    "genitiveField": "Genitiv (słowa der/das)",
+    "genitivePlaceholder": "zgadywany, jeśli puste",
+    "meaningPluralField": "Znaczenie w l. mnogiej",
+    "meaningPluralPlaceholder": "np. psy",
+    "addWord": "Dodaj słówko",
+    "all": "Wszystkie",
+    "hideArticles": "Ukryj rodzajniki (dotknij słówka, żeby sprawdzić)",
+    "noMatches": "Brak słówek z tym rodzajnikiem.",
+    "empty": "Brak słówek. Dodaj pierwsze słówko powyżej.",
+    "remove": "Usuń {word}",
+    "confirmDelete": {
+      "one": "Usunąć zestaw „{name}” ({count} słówko)? Tego nie da się cofnąć.",
+      "few": "Usunąć zestaw „{name}” ({count} słówka)? Tego nie da się cofnąć.",
+      "many": "Usunąć zestaw „{name}” ({count} słówek)? Tego nie da się cofnąć.",
+      "other": "Usunąć zestaw „{name}” ({count} słówka)? Tego nie da się cofnąć."
+    },
+    "deleted": "Usunięto „{name}”.",
+    "importFailed": "Nie udało się odczytać żadnych słówek z „{file}”.",
+    "imported": {
+      "one": "Zaimportowano {count} słówko do nowego zestawu.",
+      "few": "Zaimportowano {count} słówka do nowego zestawu.",
+      "many": "Zaimportowano {count} słówek do nowego zestawu.",
+      "other": "Zaimportowano {count} słówka do nowego zestawu."
+    },
+    "skipped": {
+      "one": "Pominięto {count} wiersz:",
+      "few": "Pominięto {count} wiersze:",
+      "many": "Pominięto {count} wierszy:",
+      "other": "Pominięto {count} wiersza:"
+    },
+    "moreErrors": "…i {count} więcej.",
+    "importedSetName": "Zaimportowane słówka"
+  },
+  "errors": {
+    "row": "Wiersz {row}: {message}",
+    "wordMissing": "Wpisz słowo po niemiecku.",
+    "notOneWord": "„{word}” powinno być jednym słowem, z samych liter.",
+    "genderMissing": "Wybierz der, die, das albo liczbę mnogą dla „{word}”.",
+    "unknownKind": "Nieznany rodzaj rzeczy „{kind}”. Użyj: {kinds}.",
+    "duplicate": "„{word}” już jest w tym zestawie.",
+    "builtIn": "Wbudowanych zestawów nie można zmieniać. Najpierw skopiuj zestaw.",
+    "duplicateInFile": "„{word}” występuje dwa razy.",
+    "emptyFile": "Plik jest pusty."
+  }
+}

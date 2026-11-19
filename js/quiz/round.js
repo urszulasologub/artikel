@@ -1,8 +1,6 @@
 // A round is a fixed number of questions, then one retry of each missed question, then a summary.
 // Pure logic, no DOM.
 
-import { CASE_NAMES, GENDER_NAMES } from '../grammar/articles.js';
-
 export const ROUND_LENGTH = 10;
 const WEAK_SPOT_MIN_MISSES = 2;
 
@@ -32,7 +30,7 @@ export function recordAnswer(round, question, correct) {
 /**
  * The score counts first tries only. `fixed` counts misses answered right on the retry.
  * `stillWrong` is what to review. The weak spot is the case + gender missed most often
- * (at least twice), e.g. "Dativ feminine".
+ * (at least twice), e.g. { case: 'dat', gender: 'f' }.
  */
 export function summarize(round) {
   const mistakes = missedQuestions(round);
@@ -61,5 +59,5 @@ function missedQuestions(round) {
 
 function toWeakSpot(key) {
   const [grammarCase, gender] = key.split('|');
-  return { case: grammarCase, gender, label: `${CASE_NAMES[grammarCase]} ${GENDER_NAMES[gender]}` };
+  return { case: grammarCase, gender };
 }

@@ -51,7 +51,7 @@ test('missed questions are asked once more, in order', () => {
 
 test('summary finds the weak spot', () => {
   const round = playMain([[q('dat', 'f'), false], [q('akk', 'm'), false], [q('dat', 'f'), false]]);
-  assert.equal(summarize(round).weakSpot.label, 'Dativ feminine');
+  assert.deepEqual(summarize(round).weakSpot, { case: 'dat', gender: 'f' });
 });
 
 test('no weak spot when no mistake repeats', () => {
