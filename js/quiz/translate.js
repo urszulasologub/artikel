@@ -47,6 +47,11 @@ export function nounMeaning(noun, language) {
   return noun.en;
 }
 
+/** "teacher (m)" → "teacher": removes notes that would give away the gender. */
+export function withoutGenderNote(meaning) {
+  return meaning.replace(/\s*\((m|f|n)\)/g, '');
+}
+
 /** "the man", "a man", "an apple", "the men". */
 export function nounPhrase(noun, plural, articleType) {
   const word = plural ? (noun.enPlural ?? `${englishSingular(noun)}s`) : englishSingular(noun);

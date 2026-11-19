@@ -8,7 +8,7 @@ import { SENTENCES_BY_ID } from '../data/sentences.js';
 import { CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
 import { language, t } from '../i18n/index.js';
 import { checkAnswer, explain, translateQuestion } from '../quiz/generator.js';
-import { nounMeaning } from '../quiz/translate.js';
+import { nounMeaning, withoutGenderNote } from '../quiz/translate.js';
 import { el } from './dom.js';
 import { genderMark } from './marks.js';
 
@@ -137,7 +137,7 @@ export function renderQuestion(answer, settings, handlers) {
 
   return [
     el('p', { class: 'sentence' }, beforeParts, gap, ' ', noun, afterParts),
-    answer.lookup && renderWordInfo(answer, clue, meaning),
+    answer.lookup && renderWordInfo(answer, settings, clue, meaning),
     answered && renderTranslation(question, 'p'),
     el('div', { class: 'hints' }, hints),
     asking && renderCaseStep(answer, settings, handlers.pickCase),
@@ -173,10 +173,14 @@ function withClue(text, clueText, button) {
   return [[text.slice(0, match.index), button, text.slice(match.index + clueText.length)], true];
 }
 
-function renderWordInfo(answer, clue, nounMeaningText) {
+function renderWordInfo(answer, settings, clue, nounMeaningText) {
   const { question, lookup } = answer;
   if (lookup === 'clue') {
     return el('p', { class: 'word-info' }, el('strong', {}, clue.lemma), ` — ${language === 'pl' ? clue.pl : clue.en}`);
+  }
+  // When the level hides the gender, the meaning must not give it away: no "(m)", "(f)" or "(plural)".
+  if (!settings.showGender) {
+    return el('p', { class: 'word-info' }, el('strong', {}, question.nounText), ` — ${withoutGenderNote(nounMeaningText)}`);
   }
   const plural = question.plural ? ` (${t('quiz.wordInfoPlural')})` : '';
   return el('p', { class: 'word-info' }, el('strong', {}, question.nounText), ` — ${nounMeaningText}${plural}`);

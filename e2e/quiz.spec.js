@@ -339,3 +339,20 @@ test('there is no typing option: answers are always chosen', async ({ page }) =>
   await expect(card(page).getByRole('textbox')).toHaveCount(0);
   app.expectNoErrors();
 });
+
+test('when the gender is hidden, a tapped meaning does not give it away', async ({ page }) => {
+  // A user-added word whose meaning has a gender note, on a level that hides the gender.
+  await seedBruderQuestion(page, { settings: { showGender: false }, noun: { word: 'Brudi', en: 'bro (m)' } });
+  const app = await openApp(page);
+  await card(page).getByRole('button', { name: 'Bruder' }).click();
+  await expect(card(page).locator('.word-info')).toHaveText('Bruder — bro');
+  app.expectNoErrors();
+});
+
+test('when the gender is shown anyway, the meaning keeps its note', async ({ page }) => {
+  await seedBruderQuestion(page, { noun: { word: 'Brudi', en: 'bro (m)' } });
+  const app = await openApp(page);
+  await card(page).getByRole('button', { name: 'Bruder' }).click();
+  await expect(card(page).locator('.word-info')).toHaveText('Bruder — bro (m)');
+  app.expectNoErrors();
+});
