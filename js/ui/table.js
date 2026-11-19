@@ -36,3 +36,23 @@ export function declensionTable(articleType, cases, highlight = null) {
     el('table', { class: 'declension' }, el('thead', {}, header), el('tbody', {}, rows)),
   );
 }
+
+/**
+ * The grammar table panel under a question, following the settings' tableMode (open, toggle or hidden).
+ * After an answer, the cell with the right article is highlighted.
+ */
+export function tablePanel(settings, answer, open, toggle) {
+  if (settings.tableMode === 'hidden') return el('div');
+
+  const visible = settings.tableMode === 'open' || open;
+  const { question, answered } = answer;
+  const highlight = answered ? { case: question.case, gender: question.gender } : null;
+  const tables = settings.articleTypes.map((type) => declensionTable(type, settings.cases, highlight));
+
+  return el('section', { class: 'panel' },
+    settings.tableMode === 'toggle' &&
+      el('button', { type: 'button', class: 'btn', 'aria-expanded': String(visible), onClick: toggle },
+        visible ? t('quiz.hideTable') : t('quiz.showTable')),
+    visible && el('div', { class: 'tables' }, tables),
+  );
+}

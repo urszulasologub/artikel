@@ -2,16 +2,37 @@
   "app": {
     "title": "Artikel Trainer",
     "description": "Practise German articles in all four cases.",
-    "tabs": { "practice": "Practice", "learn": "Learn", "words": "Words" },
+    "tabs": {
+      "practice": "Practice",
+      "rush": "Rush",
+      "learn": "Learn",
+      "words": "Words"
+    },
     "sections": "Sections",
     "language": "Language",
     "sound": "Sound",
     "soundOn": "Sound on",
     "soundOff": "Sound off"
   },
-  "genders": { "m": "masculine", "f": "feminine", "n": "neuter", "pl": "plural" },
-  "genderColumns": { "m": "masc.", "f": "fem.", "n": "neut.", "pl": "plural" },
-  "presets": { "easy": "Easy", "medium": "Medium", "mediumPlus": "Medium+", "hard": "Hard", "custom": "Custom" },
+  "genders": {
+    "m": "masculine",
+    "f": "feminine",
+    "n": "neuter",
+    "pl": "plural"
+  },
+  "genderColumns": {
+    "m": "masc.",
+    "f": "fem.",
+    "n": "neut.",
+    "pl": "plural"
+  },
+  "presets": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "mediumPlus": "Medium+",
+    "hard": "Hard",
+    "custom": "Custom"
+  },
   "settings": {
     "title": "Settings",
     "difficulty": "Difficulty",
@@ -41,7 +62,10 @@
     "newQuiz": "↺ New quiz",
     "newQuizTitle": "Abandon this quiz and start a new one",
     "inARow": "in a row",
-    "streakTitle": { "one": "{count} correct in a row", "other": "{count} correct in a row" },
+    "streakTitle": {
+      "one": "{count} correct in a row",
+      "other": "{count} correct in a row"
+    },
     "plural": "plural",
     "whichCase": "Which case is it?",
     "pickArticle": "Now pick the article",
@@ -86,12 +110,56 @@
     "great": "Sehr gut! Almost there.",
     "good": "Gut gemacht. Solid progress.",
     "keepGoing": "Keep going, it gets easier.",
-    "fixedAll": { "one": "You fixed it on the second try.", "other": "You fixed all {count} on the second try." },
+    "fixedAll": {
+      "one": "You fixed it on the second try.",
+      "other": "You fixed all {count} on the second try."
+    },
     "fixedSome": "Fixed on the second try: {fixed} of {total}.",
     "weakSpot": "Your weak spot:",
     "weakSpotLabel": "{case} {gender}",
     "stillToPractise": "Still to practise",
     "newRound": "New round"
+  },
+  "rush": {
+    "title": "Artikel Rush",
+    "tagline": "How far can you get? Every round is harder, and from round 6 the clock is ticking.",
+    "rules": [
+      "Each round has 10 questions. Easy first, then harder.",
+      "You have 3 hearts. A wrong answer or running out of time costs one; every 10 right answers win one back.",
+      "Answer right in a row to multiply your points."
+    ],
+    "casesLabel": "Cases (choose at least {min})",
+    "words": "Words: {name}, {count}.",
+    "start": "Start",
+    "needCases": "Choose at least {min} cases.",
+    "emptySet": "The word set \"{name}\" is empty. Choose another one in the Words tab.",
+    "hearts": {
+      "one": "{count} heart left",
+      "other": "{count} hearts left"
+    },
+    "points": "points",
+    "roundLevel": "Round {n} · {level}",
+    "roundStart": "Round {n}",
+    "seconds": "{seconds} s",
+    "timeOut": "Time's up!",
+    "endGame": "End game",
+    "gameOver": "Game over",
+    "reached": "You reached round {round}.",
+    "bestCombo": {
+      "one": "Best combo: {count} right answer in a row.",
+      "other": "Best combo: {count} right answers in a row."
+    },
+    "newHighScore": "New high score! Enter your name:",
+    "namePlaceholder": "Your name",
+    "save": "Save",
+    "savedRank": "Saved! You are number {rank}.",
+    "playAgain": "Play again",
+    "changeCases": "Change cases",
+    "highScores": "High scores",
+    "noScores": "No scores yet. Be the first!",
+    "name": "Name",
+    "score": "Score",
+    "round": "Round"
   },
   "learn": {
     "title": "How cases work",
@@ -106,7 +174,10 @@
       "nom": {
         "meaning": "who? what?",
         "use": "The subject: the person or thing doing the action. Also after \"sein\" (to be).",
-        "triggers": ["Subject of the sentence", "after sein, werden, bleiben"],
+        "triggers": [
+          "Subject of the sentence",
+          "after sein, werden, bleiben"
+        ],
         "tip": "This is the form you learn in the dictionary."
       },
       "akk": {
@@ -132,18 +203,31 @@
       "gen": {
         "meaning": "whose?",
         "use": "Possession: whose something is. Also after some prepositions.",
-        "triggers": ["Possession: das Auto des Mannes", "Prepositions: wegen, trotz, während, statt"],
+        "triggers": [
+          "Possession: das Auto des Mannes",
+          "Prepositions: wegen, trotz, während, statt"
+        ],
         "tip": "Masculine and neuter nouns get -s or -es: des Mannes, des Kindes."
       }
     }
   },
-  "kinds": { "thing": "Thing", "person": "Person", "animal": "Animal", "place": "Place, furniture or vehicle" },
+  "kinds": {
+    "thing": "Thing",
+    "person": "Person",
+    "animal": "Animal",
+    "place": "Place, furniture or vehicle"
+  },
   "words": {
     "title": "Word sets",
-    "builtInNames": { "basics": "Basics" },
+    "builtInNames": {
+      "basics": "Basics"
+    },
     "practiseWith": "Practise with",
     "builtIn": "{name} (built-in)",
-    "count": { "one": "{count} word", "other": "{count} words" },
+    "count": {
+      "one": "{count} word",
+      "other": "{count} words"
+    },
     "builtInHint": "This built-in set cannot be changed. Copy it to add or remove words.",
     "name": "Name",
     "newSet": "New empty set",
@@ -182,8 +266,14 @@
     },
     "deleted": "Deleted \"{name}\".",
     "importFailed": "No words could be read from \"{file}\".",
-    "imported": { "one": "Imported {count} word into a new set.", "other": "Imported {count} words into a new set." },
-    "skipped": { "one": "Skipped {count} row:", "other": "Skipped {count} rows:" },
+    "imported": {
+      "one": "Imported {count} word into a new set.",
+      "other": "Imported {count} words into a new set."
+    },
+    "skipped": {
+      "one": "Skipped {count} row:",
+      "other": "Skipped {count} rows:"
+    },
     "moreErrors": "…and {count} more.",
     "importedSetName": "Imported words"
   },

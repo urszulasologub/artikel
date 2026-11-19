@@ -21,7 +21,7 @@ import {
 } from './question-card.js';
 import { setName } from './set-name.js';
 import { playSound } from './sound.js';
-import { declensionTable } from './table.js';
+import { tablePanel } from './table.js';
 
 const STREAK_MILESTONE = 5;
 
@@ -117,7 +117,7 @@ export function mountQuizView(root, { wordSets }) {
     else if (!answer.question) card = renderEmptySet(wordSets.activeSet());
     else card = renderCard(state, { handlers, next, newRound });
     cardSlot.replaceChildren(card);
-    tableSlot.replaceChildren(renderTable(state, () => {
+    tableSlot.replaceChildren(tablePanel(settings, answer, state.tableOpen, () => {
       state.tableOpen = !state.tableOpen;
       render();
     }));
@@ -321,22 +321,6 @@ function renderSummary({ round }, newRound) {
       ))),
     ),
     el('button', { type: 'button', class: 'btn primary next', onClick: newRound }, t('summary.newRound')),
-  );
-}
-
-function renderTable({ settings, answer, tableOpen }, toggle) {
-  if (settings.tableMode === 'hidden') return el('div');
-
-  const visible = settings.tableMode === 'open' || tableOpen;
-  const { question, answered } = answer;
-  const highlight = answered ? { case: question.case, gender: question.gender } : null;
-  const tables = settings.articleTypes.map((type) => declensionTable(type, settings.cases, highlight));
-
-  return el('section', { class: 'panel' },
-    settings.tableMode === 'toggle' &&
-      el('button', { type: 'button', class: 'btn', 'aria-expanded': String(visible), onClick: toggle },
-        visible ? t('quiz.hideTable') : t('quiz.showTable')),
-    visible && el('div', { class: 'tables' }, tables),
   );
 }
 

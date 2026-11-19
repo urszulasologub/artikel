@@ -21,6 +21,30 @@ const SOUNDS = {
     ...[523.3, 659.3, 784].map((freq, i) => ({ freq, start: i * 0.1, duration: 0.2 })),
     ...[523.3, 659.3, 784, 1046.5].map((freq) => ({ freq, start: 0.32, duration: 0.7, volume: 0.09 })),
   ],
+
+  // Artikel Rush
+  tick: [{ freq: 1568, start: 0, duration: 0.05, volume: 0.07 }],
+  tickUrgent: [{ freq: 1760, start: 0, duration: 0.06, volume: 0.12 }],
+  comboUp: [659.3, 880, 1318.5].map((freq, i) => ({ freq, start: i * 0.06, duration: 0.18, volume: 0.14 })),
+  heartLost: [
+    { freq: 392, start: 0, duration: 0.18, slideTo: 330, volume: 0.2 },
+    { freq: 262, start: 0.16, duration: 0.4, slideTo: 196, volume: 0.2 },
+  ],
+  heartGained: [523.3, 784, 1046.5].map((freq, i) => ({ freq, start: i * 0.08, duration: 0.25, volume: 0.14 })),
+  roundUp: [
+    ...[392, 523.3, 659.3, 784].map((freq, i) => ({ freq, start: i * 0.08, duration: 0.18 })),
+    { freq: 1046.5, start: 0.34, duration: 0.5, volume: 0.12 },
+  ],
+  timeOut: [
+    { freq: 880, start: 0, duration: 0.12, volume: 0.18 },
+    { freq: 880, start: 0.15, duration: 0.12, volume: 0.18 },
+    { freq: 220, start: 0.32, duration: 0.6, slideTo: 110, volume: 0.22 },
+  ],
+  gameOver: [392, 349.2, 311.1, 261.6].map((freq, i) => ({ freq, start: i * 0.22, duration: 0.35, slideTo: freq * 0.97, volume: 0.18 })),
+  highScore: [
+    ...[523.3, 659.3, 784, 1046.5, 1318.5].map((freq, i) => ({ freq, start: i * 0.09, duration: 0.2 })),
+    ...[523.3, 659.3, 784, 1046.5].map((freq) => ({ freq, start: 0.5, duration: 0.9, volume: 0.08 })),
+  ],
 };
 
 export function playSound(name) {

@@ -2,16 +2,37 @@
   "app": {
     "title": "Artikel Trainer",
     "description": "Ćwicz niemieckie rodzajniki we wszystkich czterech przypadkach.",
-    "tabs": { "practice": "Ćwiczenia", "learn": "Nauka", "words": "Słówka" },
+    "tabs": {
+      "practice": "Ćwiczenia",
+      "rush": "Rush",
+      "learn": "Nauka",
+      "words": "Słówka"
+    },
     "sections": "Sekcje",
     "language": "Język",
     "sound": "Dźwięk",
     "soundOn": "Dźwięk włączony",
     "soundOff": "Dźwięk wyłączony"
   },
-  "genders": { "m": "rodzaj męski", "f": "rodzaj żeński", "n": "rodzaj nijaki", "pl": "liczba mnoga" },
-  "genderColumns": { "m": "męski", "f": "żeński", "n": "nijaki", "pl": "l. mnoga" },
-  "presets": { "easy": "Łatwy", "medium": "Średni", "mediumPlus": "Średni+", "hard": "Trudny", "custom": "Własny" },
+  "genders": {
+    "m": "rodzaj męski",
+    "f": "rodzaj żeński",
+    "n": "rodzaj nijaki",
+    "pl": "liczba mnoga"
+  },
+  "genderColumns": {
+    "m": "męski",
+    "f": "żeński",
+    "n": "nijaki",
+    "pl": "l. mnoga"
+  },
+  "presets": {
+    "easy": "Łatwy",
+    "medium": "Średni",
+    "mediumPlus": "Średni+",
+    "hard": "Trudny",
+    "custom": "Własny"
+  },
   "settings": {
     "title": "Ustawienia",
     "difficulty": "Poziom",
@@ -103,6 +124,51 @@
     "stillToPractise": "Do powtórki",
     "newRound": "Nowa runda"
   },
+  "rush": {
+    "title": "Artikel Rush",
+    "tagline": "Jak daleko zajdziesz? Każda runda jest trudniejsza, a od 6. rundy liczy się czas.",
+    "rules": [
+      "Każda runda ma 10 pytań. Najpierw łatwo, potem trudniej.",
+      "Masz 3 serca. Zła odpowiedź albo koniec czasu zabiera jedno; co 10 dobrych odpowiedzi jedno wraca.",
+      "Odpowiadaj dobrze pod rząd, żeby mnożyć punkty."
+    ],
+    "casesLabel": "Przypadki (wybierz co najmniej {min})",
+    "words": "Słówka: {name}, {count}.",
+    "start": "Start",
+    "needCases": "Wybierz co najmniej {min} przypadki.",
+    "emptySet": "Zestaw „{name}” jest pusty. Wybierz inny w zakładce Słówka.",
+    "hearts": {
+      "one": "Zostało {count} serce",
+      "few": "Zostały {count} serca",
+      "many": "Zostało {count} serc",
+      "other": "Zostało {count} serca"
+    },
+    "points": "pkt",
+    "roundLevel": "Runda {n} · {level}",
+    "roundStart": "Runda {n}",
+    "seconds": "{seconds} s",
+    "timeOut": "Koniec czasu!",
+    "endGame": "Zakończ grę",
+    "gameOver": "Koniec gry",
+    "reached": "Dotarłeś do rundy {round}.",
+    "bestCombo": {
+      "one": "Najlepsza seria: {count} dobra odpowiedź pod rząd.",
+      "few": "Najlepsza seria: {count} dobre odpowiedzi pod rząd.",
+      "many": "Najlepsza seria: {count} dobrych odpowiedzi pod rząd.",
+      "other": "Najlepsza seria: {count} dobrych odpowiedzi pod rząd."
+    },
+    "newHighScore": "Nowy rekord! Wpisz swoje imię:",
+    "namePlaceholder": "Twoje imię",
+    "save": "Zapisz",
+    "savedRank": "Zapisano! Jesteś na miejscu {rank}.",
+    "playAgain": "Zagraj jeszcze raz",
+    "changeCases": "Zmień przypadki",
+    "highScores": "Najlepsze wyniki",
+    "noScores": "Brak wyników. Bądź pierwszy!",
+    "name": "Imię",
+    "score": "Wynik",
+    "round": "Runda"
+  },
   "learn": {
     "title": "Jak działają przypadki",
     "intro": "W niemieckim rodzajnik zmienia się zależnie od roli rzeczownika w zdaniu. Ta rola to przypadek. Zadaj pytanie przypadku, żeby go znaleźć, a potem odczytaj rodzajnik z tabeli.",
@@ -116,7 +182,10 @@
       "nom": {
         "meaning": "kto? co?",
         "use": "Podmiot: osoba lub rzecz, która wykonuje czynność. Także po „sein” (być).",
-        "triggers": ["Podmiot zdania", "po sein, werden, bleiben"],
+        "triggers": [
+          "Podmiot zdania",
+          "po sein, werden, bleiben"
+        ],
         "tip": "To forma, którą znajdziesz w słowniku."
       },
       "akk": {
@@ -142,18 +211,33 @@
       "gen": {
         "meaning": "czyj? czyja? czyje?",
         "use": "Przynależność: do kogo coś należy. Także po niektórych przyimkach.",
-        "triggers": ["Przynależność: das Auto des Mannes", "Przyimki: wegen, trotz, während, statt"],
+        "triggers": [
+          "Przynależność: das Auto des Mannes",
+          "Przyimki: wegen, trotz, während, statt"
+        ],
         "tip": "Rzeczowniki rodzaju męskiego i nijakiego dostają -s lub -es: des Mannes, des Kindes."
       }
     }
   },
-  "kinds": { "thing": "Rzecz", "person": "Osoba", "animal": "Zwierzę", "place": "Miejsce, mebel lub pojazd" },
+  "kinds": {
+    "thing": "Rzecz",
+    "person": "Osoba",
+    "animal": "Zwierzę",
+    "place": "Miejsce, mebel lub pojazd"
+  },
   "words": {
     "title": "Zestawy słówek",
-    "builtInNames": { "basics": "Podstawy" },
+    "builtInNames": {
+      "basics": "Podstawy"
+    },
     "practiseWith": "Ćwicz z zestawem",
     "builtIn": "{name} (wbudowany)",
-    "count": { "one": "{count} słówko", "few": "{count} słówka", "many": "{count} słówek", "other": "{count} słówka" },
+    "count": {
+      "one": "{count} słówko",
+      "few": "{count} słówka",
+      "many": "{count} słówek",
+      "other": "{count} słówka"
+    },
     "builtInHint": "Tego wbudowanego zestawu nie można zmieniać. Skopiuj go, żeby dodawać lub usuwać słówka.",
     "name": "Nazwa",
     "newSet": "Nowy pusty zestaw",

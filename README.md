@@ -41,6 +41,11 @@ js/
   i18n/en.json, pl.json all interface texts, one JSON file per language
   data/nouns-pl.js      Polish forms of the built-in nouns, for Polish sentence translations
   progress.js           saves the current quiz so a refresh continues it
+  game/rules.js         Artikel Rush: all game numbers (rounds, points, combo, hearts, timers)
+  game/engine.js        Artikel Rush game logic (pure; the view passes in elapsed time)
+  game/high-scores.js   Artikel Rush top 10, saved in the browser
+  ui/question-card.js   one question with its answer area, shared by Practice and Rush
+  ui/rush-view.js       the Rush tab
 tests/                  Node tests for logic and data
 e2e/                    Playwright browser tests
 scripts/serve.js        development server (no caching)
@@ -61,6 +66,11 @@ scripts/serve.js        development server (no caching)
 
 - **Interface text:** add the key to both `js/i18n/en.json` and `js/i18n/pl.json`, then use `t('your.key')`.
   A test fails if the two files have different keys or the code uses a key that doesn't exist.
+- **Game rules (Artikel Rush):** edit `js/game/rules.js`. Add a round by adding a line to `rounds`;
+  `level` is one of the difficulty presets in `js/settings.js`. Tests check the rules stay valid.
+- **More article-like words** (kein, mein, dein, euer…): add an entry to `ARTICLE_TYPES` in
+  `js/grammar/articles.js`, built with `einWord('mein')` (or `einWord('euer', { stem: 'eur' })`).
+  Sentence translations would also need to say "my" instead of "a".
 - **A new language:** add a JSON file with the same keys and register it in `LANGUAGES` in `js/i18n/index.js`.
 
 Run `npm test` after changes. The data tests catch broken entries.

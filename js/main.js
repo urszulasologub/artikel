@@ -3,6 +3,7 @@
 
 import { LANGUAGES, language, setLanguage, t } from './i18n/index.js';
 import { mountQuizView } from './ui/quiz-view.js';
+import { mountRushView } from './ui/rush-view.js';
 import { mountSoundToggle } from './ui/sound.js';
 import { mountTutorialView } from './ui/tutorial-view.js';
 import { mountWordsView } from './ui/words-view.js';
@@ -10,18 +11,21 @@ import { createWordSetStore } from './words/store.js';
 
 const VIEWS = {
   practice: mountQuizView,
+  rush: mountRushView,
   learn: mountTutorialView,
   words: mountWordsView,
 };
 const DEFAULT_VIEW = 'practice';
 
 translateStaticText();
+trackHeaderHeight();
 
 // One shared store, so the Practice tab follows changes made in the Words tab.
-const wordSets = createWordSetStore(browserStorage());
+const storage = browserStorage();
+const wordSets = createWordSetStore(storage);
 
 for (const [id, mount] of Object.entries(VIEWS)) {
-  mount(document.getElementById(`view-${id}`), { wordSets });
+  mount(document.getElementById(`view-${id}`), { wordSets, storage });
 }
 
 function showView() {
@@ -64,6 +68,14 @@ function mountLanguageSwitch(group) {
       location.reload();
     });
   }
+}
+
+// Sticky bars below the sticky header (like the Rush score bar) need its height, which differs per screen.
+function trackHeaderHeight() {
+  const header = document.querySelector('.top');
+  const update = () => document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+  new ResizeObserver(update).observe(header);
+  update();
 }
 
 function browserStorage() {
