@@ -30,8 +30,8 @@ export const RULES = {
   // mistake (wrong case, wrong article, half-right or running out of time).
   startLevels: [
     { level: 'easy', round: 0, bonus: 1 },
-    { level: 'medium', round: 1, bonus: 1.2 },
-    { level: 'hard', round: 2, bonus: 1.5 },
+    { level: 'medium', round: 1, bonus: 1.4 },
+    { level: 'hard', round: 2, bonus: 1.7 },
   ],
 
   // `level` is a difficulty preset from settings.js. `timer` (seconds, plus `bonus` seconds per right
