@@ -1,11 +1,16 @@
 // Word sets: the built-in set plus the user's own sets, saved in the browser.
 // Views share one store and re-render when it reports a change.
 
+import { EVERYDAY_NOUNS } from '../data/nouns-everyday.js';
 import { NOUNS } from '../data/nouns.js';
 
 const STORAGE_KEY = 'german-grammar:word-sets';
 
-export const BUILT_IN_SETS = [{ id: 'basics', name: 'Basics', builtIn: true, nouns: NOUNS }];
+// Built-in sets, shown first. Names in the interface come from the i18n files (words.builtInNames).
+export const BUILT_IN_SETS = [
+  { id: 'basics', name: 'Basics', builtIn: true, nouns: NOUNS },
+  { id: 'everyday', name: 'Everyday German', builtIn: true, nouns: [...NOUNS, ...EVERYDAY_NOUNS] },
+];
 
 /**
  * @param {Storage | null} storage where custom sets are kept; null keeps them in memory only

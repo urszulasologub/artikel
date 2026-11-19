@@ -32,11 +32,11 @@ test('Polish: "drzwi" takes a plural verb even for the singular "Tür"', () => {
 });
 
 test('Polish: no translation for user-added words', () => {
-  assert.equal(translatePolish('Widzę {acc}.', { noun: { word: 'Löffel' }, plural: false }), null);
+  assert.equal(translatePolish('Widzę {acc}.', { noun: { word: 'Kanne' }, plural: false }), null);
 });
 
 test('meanings follow the language for built-in words only', () => {
   assert.equal(nounMeaning(man, 'en'), 'man');
   assert.equal(nounMeaning(man, 'pl'), 'mężczyzna');
-  assert.equal(nounMeaning({ word: 'Löffel', en: 'łyżka' }, 'pl'), 'łyżka');
+  assert.equal(nounMeaning({ word: 'Kanne', en: 'dzbanek' }, 'pl'), 'dzbanek');
 });

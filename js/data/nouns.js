@@ -2,7 +2,8 @@
 // Gender 'pl' marks plural-only words (die Eltern); their `plural` is the word itself.
 // `en` is shown as a hint; its first meaning (without notes in brackets) is used in translations.
 // Tags decide which sentences a noun fits into:
-//   person, animal, object (small things you can hold), place (furniture, buildings, vehicles).
+//   person, animal, object (small things you can hold), place (furniture, vehicles, a house),
+//   building (buildings and places in town you can go into: school, park, station).
 
 export const NOUNS = [
   // People

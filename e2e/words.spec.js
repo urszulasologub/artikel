@@ -80,13 +80,14 @@ test('delete a set after confirming', async ({ page }) => {
   const app = await openApp(page, 'words');
   await words(page).getByRole('button', { name: 'New empty set' }).click();
 
+  const builtIn = 2;
   page.once('dialog', (dialog) => dialog.dismiss());
   await words(page).getByRole('button', { name: 'Delete set' }).click();
-  await expect(setSelect(page).locator('option')).toHaveCount(2);
+  await expect(setSelect(page).locator('option')).toHaveCount(builtIn + 1);
 
   page.once('dialog', (dialog) => dialog.accept());
   await words(page).getByRole('button', { name: 'Delete set' }).click();
-  await expect(setSelect(page).locator('option')).toHaveCount(1);
+  await expect(setSelect(page).locator('option')).toHaveCount(builtIn);
   await expect(setSelect(page)).toHaveValue('basics');
   app.expectNoErrors();
 });
@@ -147,5 +148,17 @@ test('add a plural-only word and practise it', async ({ page }) => {
   await expect(card(page).locator('.hints')).toContainText('plural');
   await card(page).locator('.choice', { hasText: /^die$/i }).click();
   await expect(card(page).locator('.translation')).toContainText('holidays');
+  app.expectNoErrors();
+});
+
+test('two built-in sets: Basics and the bigger Everyday German', async ({ page }) => {
+  const app = await openApp(page, 'words');
+  await expect(setSelect(page).locator('option')).toHaveText(['Basics (built-in)', 'Everyday German (built-in)']);
+  const basics = await words(page).locator('.noun-item').count();
+
+  await setSelect(page).selectOption('everyday');
+  await expect(words(page).locator('.noun-item').first()).toBeVisible();
+  expect(await words(page).locator('.noun-item').count()).toBeGreaterThan(basics * 3);
+  await expect(words(page).getByRole('button', { name: 'Delete set' })).toHaveCount(0);
   app.expectNoErrors();
 });

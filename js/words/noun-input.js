@@ -7,6 +7,7 @@ export const KINDS = {
   person: { tag: 'person' },
   animal: { tag: 'animal' },
   place: { tag: 'place' },
+  building: { tag: 'building' },
 };
 
 // 'pl' is for plural-only words like die Eltern.

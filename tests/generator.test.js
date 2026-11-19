@@ -55,11 +55,11 @@ test('does not repeat the previous question', () => {
 });
 
 test('works with a custom word list, including words without plural or English', () => {
-  const nouns = [createNoun({ word: 'die Tasse' }).noun];
+  const nouns = [createNoun({ word: 'die Kanne' }).noun];
   const settings = { cases: ['nom', 'akk', 'dat', 'gen'], articleTypes: ['definite', 'indefinite'] };
   for (let i = 0; i < 200; i++) {
     const q = createQuestion(settings, { nouns });
-    assert.equal(q.noun.word, 'Tasse');
+    assert.equal(q.noun.word, 'Kanne');
     assert.equal(q.plural, false);
     assert.equal(translateQuestion(q, 'en'), null);
     assert.equal(translateQuestion(q, 'pl'), null);

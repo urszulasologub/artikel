@@ -4,6 +4,7 @@
 // The answer state is a plain object (see newAnswer) owned by the view. pickCase() and submitAnswer()
 // update it; the view then plays sounds, keeps score and re-renders.
 
+import { SENTENCES_BY_ID } from '../data/sentences.js';
 import { ARTICLE_TYPES, CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
 import { language, t } from '../i18n/index.js';
 import { checkAnswer, explain, translateQuestion } from '../quiz/generator.js';
@@ -17,6 +18,10 @@ export function newAnswer(question) {
     answered: false,
     userAnswer: '',
     caseAnswer: null,
+    // Text typed so far, kept so a re-render (e.g. after looking up a word) doesn't clear it.
+    draft: '',
+    // Which word's meaning is shown: 'noun', 'clue' or null.
+    lookup: null,
     caseCorrect: true,
     articleCorrect: false,
     correct: false,
@@ -53,6 +58,11 @@ export function submitAnswer(answer, settings, input) {
   return true;
 }
 
+/** Shows or hides the meaning of the noun or the clue word (the verb or preposition that decides the case). */
+export function toggleLookup(answer, which) {
+  answer.lookup = answer.lookup === which ? null : which;
+}
+
 /** Right article, wrong case. */
 export function isPartial(answer) {
   return !answer.correct && answer.articleCorrect;
@@ -79,7 +89,8 @@ export function handleNumberKey(event, answer, settings, handlers) {
 
 /**
  * The question and answer area, without the view's own header and Continue button.
- * @param {{ pickCase: (grammarCase: string) => void, submit: (input: string) => void }} handlers
+ * @param {{ pickCase: (grammarCase: string) => void, submit: (input: string) => void,
+ *           lookup: (which: 'noun' | 'clue') => void }} handlers
  * @returns {Node[]}
  */
 export function renderQuestion(answer, settings, handlers) {
@@ -103,12 +114,35 @@ export function renderQuestion(answer, settings, handlers) {
       CASE_NAMES[question.case], el('span', { class: 'case-q' }, CASE_QUESTIONS[question.case])),
     settings.showGender && el('span', { class: `tag g-${question.gender}` },
       genderMark(question.gender), t(`genders.${question.gender}`)),
-    renderMeaning(question),
   ];
 
+  // The clue word (e.g. "helfe", "mit") and the noun can be tapped to see what they mean.
+  const clue = SENTENCES_BY_ID[question.sentenceId].clue;
+  const clueText = pickNumber(clue.text, question.plural);
+  const clueButton = el('button', {
+    type: 'button',
+    class: `word-tap clue${answer.lookup === 'clue' ? ' active' : ''}`,
+    title: t('quiz.tapHint'),
+    'aria-expanded': String(answer.lookup === 'clue'),
+    onClick: () => handlers.lookup('clue'),
+  }, clueText);
+  const [beforeParts, clueUsed] = withClue(question.before, clueText, clueButton);
+  const [afterParts] = clueUsed ? [[question.after]] : withClue(question.after, clueText, clueButton);
+
+  const meaning = nounMeaning(question.noun, language);
+  const noun = meaning
+    ? el('button', {
+      type: 'button',
+      class: `${nounClass} word-tap${answer.lookup === 'noun' ? ' active' : ''}`,
+      title: t('quiz.tapHint'),
+      'aria-expanded': String(answer.lookup === 'noun'),
+      onClick: () => handlers.lookup('noun'),
+    }, question.nounText)
+    : el('span', { class: nounClass }, question.nounText);
+
   return [
-    el('p', { class: 'sentence' },
-      question.before, gap, hint && ' ', hint, ' ', el('span', { class: nounClass }, question.nounText), question.after),
+    el('p', { class: 'sentence' }, beforeParts, gap, hint && ' ', hint, ' ', noun, afterParts),
+    answer.lookup && renderWordInfo(answer, clue, meaning),
     answered && renderTranslation(question, 'p'),
     el('div', { class: 'hints' }, hints),
     asking && renderCaseStep(answer, settings, handlers.pickCase),
@@ -130,9 +164,27 @@ function caseOptions(question, settings) {
   return CASES.filter((grammarCase) => settings.cases.includes(grammarCase) || grammarCase === question.case);
 }
 
-function renderMeaning(question) {
-  const meaning = nounMeaning(question.noun, language);
-  return meaning && el('span', { class: 'meaning' }, `${meaning}${question.plural ? ` (${t('quiz.plural')})` : ''}`);
+/** "ist|sind" → "ist" or "sind", following the noun's number. */
+function pickNumber(text, plural) {
+  const [singular, pluralForm = singular] = text.split('|');
+  return plural ? pluralForm : singular;
+}
+
+/** Splits text around the clue word (a whole word) and puts the button in its place. */
+function withClue(text, clueText, button) {
+  const escaped = clueText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = new RegExp(`(?<!\\p{L})${escaped}(?!\\p{L})`, 'u').exec(text);
+  if (!match) return [[text], false];
+  return [[text.slice(0, match.index), button, text.slice(match.index + clueText.length)], true];
+}
+
+function renderWordInfo(answer, clue, nounMeaningText) {
+  const { question, lookup } = answer;
+  if (lookup === 'clue') {
+    return el('p', { class: 'word-info' }, el('strong', {}, clue.lemma), ` — ${language === 'pl' ? clue.pl : clue.en}`);
+  }
+  const plural = question.plural ? ` (${t('quiz.wordInfoPlural')})` : '';
+  return el('p', { class: 'word-info' }, el('strong', {}, question.nounText), ` — ${nounMeaningText}${plural}`);
 }
 
 function renderCaseStep(answer, settings, pickCaseHandler) {
@@ -171,11 +223,15 @@ function renderChoices({ question, answered, userAnswer }, submit) {
   }));
 }
 
-function renderTyping({ question, answered, userAnswer, articleCorrect }, submit) {
+function renderTyping(answer, submit) {
+  const { question, answered, userAnswer, articleCorrect } = answer;
   const input = el('input', {
     type: 'text',
     class: `answer-input${answered ? (articleCorrect ? ' ok' : ' bad') : ''}`,
-    value: userAnswer,
+    value: answered ? userAnswer : answer.draft,
+    onInput: (event) => {
+      answer.draft = event.target.value;
+    },
     disabled: answered,
     placeholder: t('quiz.typePlaceholder', { hint: ARTICLE_TYPES[question.articleType].hint }),
     autocomplete: 'off',

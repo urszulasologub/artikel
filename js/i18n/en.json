@@ -80,7 +80,9 @@
     "showTable": "Show table",
     "emptyTitle": "\"{name}\" has no words yet",
     "emptyText": "Add some words in the Words tab, or choose another set in Settings.",
-    "addWords": "Add words"
+    "addWords": "Add words",
+    "tapHint": "Tap a highlighted word to see what it means.",
+    "wordInfoPlural": "plural"
   },
   "feedback": {
     "correct": "Correct!",
@@ -103,7 +105,10 @@
     "prepDat": "\"{word}\" is always followed by Dativ.",
     "twoWayDat": "\"{word}\" + location (wo?) takes Dativ.",
     "possession": "Possession: whose is it?",
-    "prepGen": "\"{word}\" is followed by Genitiv."
+    "prepGen": "\"{word}\" is followed by Genitiv.",
+    "afterSein": "After \"{word}\" (to be), the noun is in Nominativ too.",
+    "twoWayAkk": "\"{word}\" + direction (wohin?) takes Akkusativ.",
+    "receiverDat": "\"{word}\": the person who receives something is in Dativ."
   },
   "summary": {
     "perfect": "Perfekt! Not a single mistake.",
@@ -215,12 +220,14 @@
     "thing": "Thing",
     "person": "Person",
     "animal": "Animal",
-    "place": "Place, furniture or vehicle"
+    "place": "Place, furniture or vehicle",
+    "building": "Building or place in town"
   },
   "words": {
     "title": "Word sets",
     "builtInNames": {
-      "basics": "Basics"
+      "basics": "Basics",
+      "everyday": "Everyday German"
     },
     "practiseWith": "Practise with",
     "builtIn": "{name} (built-in)",
@@ -238,7 +245,7 @@
     "importCsv": "Import CSV",
     "deleteSet": "Delete set",
     "csvFormat": "CSV format",
-    "csvHelp": "One word per row. Only word and gender are needed; the other columns are optional. Gender is der, die, das or plural. Kind is thing, person, animal or place. Comma or semicolon both work.",
+    "csvHelp": "One word per row. Only word and gender are needed; the other columns are optional. Gender is der, die, das or plural. Kind is thing, person, animal, place or building. Comma or semicolon both work.",
     "addTitle": "Add a word",
     "germanWord": "German word",
     "wordPlaceholder": "e.g. Hund, or der Hund",

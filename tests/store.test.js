@@ -14,7 +14,10 @@ const hund = { word: 'Hund', gender: 'm', plural: 'Hunde', genitive: 'Hundes', e
 test('starts with the built-in set active', () => {
   const store = createWordSetStore(storage);
   assert.equal(store.activeSet().id, BUILT_IN_SETS[0].id);
-  assert.equal(store.listSets().length, 1);
+  assert.deepEqual(store.listSets().map((set) => set.id), ['basics', 'everyday']);
+  const [basics, everyday] = store.listSets();
+  assert.ok(everyday.nouns.length > basics.nouns.length * 3, 'Everyday German is much bigger');
+  for (const noun of basics.nouns) assert.ok(everyday.nouns.includes(noun), `Everyday German includes ${noun.word}`);
 });
 
 test('create, add, remove, rename and keep after reload', () => {

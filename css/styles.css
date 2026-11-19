@@ -346,6 +346,31 @@ details.panel[open] > summary { margin-bottom: 4px; }
 /* Which word goes in the gap when typing, e.g. "(ein)". */
 .gap-hint { color: var(--muted); font-weight: 700; font-size: 0.8em; }
 
+/* Words you can tap to see what they mean: the noun and the clue word (verb or preposition). */
+.word-tap {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline dotted 2px;
+  text-underline-offset: 5px;
+  text-decoration-color: var(--faint);
+}
+.word-tap.clue { font-weight: 800; }
+.word-tap:hover, .word-tap.active { text-decoration-color: var(--blue); text-decoration-style: solid; }
+.word-info {
+  margin: -6px 0 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--blue-soft);
+  color: var(--blue-edge);
+  font-weight: 600;
+  animation: rise 200ms ease;
+}
+.word-info strong { color: var(--ink); }
+
 .translation { color: var(--muted); font-weight: 600; margin: -8px 0 0; animation: rise 240ms ease; }
 .translation::before { content: "“"; }
 .translation::after { content: "”"; }

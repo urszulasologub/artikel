@@ -18,6 +18,7 @@ import {
   renderTranslation,
   resultClass,
   submitAnswer,
+  toggleLookup,
 } from './question-card.js';
 import { setName } from './set-name.js';
 import { playSound } from './sound.js';
@@ -96,7 +97,12 @@ export function mountQuizView(root, { wordSets }) {
     cardSlot.querySelector('.next')?.focus({ preventScroll: resultClass(answer) !== 'bad' });
   }
 
-  const handlers = { pickCase: onPickCase, submit: onSubmit };
+  function onLookup(which) {
+    toggleLookup(state.answer, which);
+    render();
+  }
+
+  const handlers = { pickCase: onPickCase, submit: onSubmit, lookup: onLookup };
 
   function updateSettings(changes, { newQuestion = false } = {}) {
     state.settings = { ...state.settings, ...changes };

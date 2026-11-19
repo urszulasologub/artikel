@@ -348,3 +348,29 @@ test('when typing, the gap says which word to use', async ({ page }) => {
   await expect(card(page).locator('.gap-hint')).toHaveCount(0);
   app.expectNoErrors();
 });
+
+test('tapping the noun or the clue word shows its meaning', async ({ page }) => {
+  await seedBruderQuestion(page); // "Ich helfe ___ Bruder."
+  const app = await openApp(page);
+
+  await card(page).getByRole('button', { name: 'helfe' }).click();
+  await expect(card(page).locator('.word-info')).toHaveText('helfen — to help');
+  await card(page).getByRole('button', { name: 'Bruder' }).click();
+  await expect(card(page).locator('.word-info')).toHaveText('Bruder — brother');
+  await card(page).getByRole('button', { name: 'Bruder' }).click();
+  await expect(card(page).locator('.word-info')).toHaveCount(0);
+  app.expectNoErrors();
+});
+
+test('looking up a word keeps the typed answer', async ({ page }) => {
+  await seedBruderQuestion(page);
+  const app = await openApp(page);
+  await settingsPanel(page).getByLabel('Typing', { exact: true }).check();
+  await card(page).locator('.case-choice', { hasText: 'Dativ' }).click();
+
+  const input = card(page).getByRole('textbox', { name: 'Your answer' });
+  await input.fill('ein');
+  await card(page).getByRole('button', { name: 'Bruder' }).click();
+  await expect(input).toHaveValue('ein');
+  app.expectNoErrors();
+});

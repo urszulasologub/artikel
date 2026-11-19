@@ -82,7 +82,9 @@
     "showTable": "Pokaż tabelę",
     "emptyTitle": "Zestaw „{name}” nie ma jeszcze słówek",
     "emptyText": "Dodaj słówka w zakładce Słówka albo wybierz inny zestaw w Ustawieniach.",
-    "addWords": "Dodaj słówka"
+    "addWords": "Dodaj słówka",
+    "tapHint": "Dotknij podświetlonego słowa, żeby zobaczyć jego znaczenie.",
+    "wordInfoPlural": "liczba mnoga"
   },
   "feedback": {
     "correct": "Dobrze!",
@@ -105,7 +107,10 @@
     "prepDat": "Po „{word}” zawsze jest Dativ.",
     "twoWayDat": "„{word}” + miejsce (wo?) to Dativ.",
     "possession": "Przynależność: czyje to jest?",
-    "prepGen": "Po „{word}” jest Genitiv."
+    "prepGen": "Po „{word}” jest Genitiv.",
+    "afterSein": "Po „{word}” (być) rzeczownik też jest w Nominativie.",
+    "twoWayAkk": "„{word}” + kierunek (wohin?) to Akkusativ.",
+    "receiverDat": "„{word}”: osoba, która coś dostaje, jest w Dativie."
   },
   "summary": {
     "perfect": "Perfekt! Ani jednego błędu.",
@@ -223,12 +228,14 @@
     "thing": "Rzecz",
     "person": "Osoba",
     "animal": "Zwierzę",
-    "place": "Miejsce, mebel lub pojazd"
+    "place": "Miejsce, mebel lub pojazd",
+    "building": "Budynek lub miejsce w mieście"
   },
   "words": {
     "title": "Zestawy słówek",
     "builtInNames": {
-      "basics": "Podstawy"
+      "basics": "Podstawy",
+      "everyday": "Niemiecki na co dzień"
     },
     "practiseWith": "Ćwicz z zestawem",
     "builtIn": "{name} (wbudowany)",
@@ -248,7 +255,7 @@
     "importCsv": "Importuj CSV",
     "deleteSet": "Usuń zestaw",
     "csvFormat": "Format CSV",
-    "csvHelp": "Jedno słówko w wierszu. Wymagane są tylko word i gender; pozostałe kolumny są opcjonalne. Gender to der, die, das albo plural. Kind to thing, person, animal albo place. Działa przecinek lub średnik.",
+    "csvHelp": "Jedno słówko w wierszu. Wymagane są tylko word i gender; pozostałe kolumny są opcjonalne. Gender to der, die, das albo plural. Kind to thing, person, animal, place albo building. Działa przecinek lub średnik.",
     "addTitle": "Dodaj słówko",
     "germanWord": "Słowo po niemiecku",
     "wordPlaceholder": "np. Hund albo der Hund",

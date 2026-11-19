@@ -18,6 +18,7 @@ import {
   renderQuestion,
   resultClass,
   submitAnswer,
+  toggleLookup,
 } from './question-card.js';
 import { setName } from './set-name.js';
 import { playSound } from './sound.js';
@@ -109,6 +110,11 @@ export function mountRushView(root, { wordSets, storage }) {
     render();
     answer.justAnswered = false;
     cardSlot.querySelector('.next')?.focus({ preventScroll: resultClass(answer) !== 'bad' });
+  }
+
+  function onLookup(which) {
+    toggleLookup(state.answer, which);
+    render();
   }
 
   function endGame() {
@@ -331,7 +337,7 @@ export function mountRushView(root, { wordSets, storage }) {
 
   function renderCard() {
     const { answer, settings, game, roundBanner, effects } = state;
-    const handlers = { pickCase: onPickCase, submit: onSubmit };
+    const handlers = { pickCase: onPickCase, submit: onSubmit, lookup: onLookup };
     const nextClass = { ok: '', partial: 'warning', bad: 'danger' }[resultClass(answer)];
     const round = roundBanner !== null && roundConfig(roundBanner);
     return el('section', { class: `panel card rush-card${effects.heartLost ? ' hit' : ''}`, 'aria-live': 'polite' },
@@ -388,7 +394,7 @@ export function mountRushView(root, { wordSets, storage }) {
 
   document.addEventListener('keydown', (event) => {
     if (!root.hidden && state.screen === 'playing') {
-      handleNumberKey(event, state.answer, state.settings, { pickCase: onPickCase, submit: onSubmit });
+      handleNumberKey(event, state.answer, state.settings, { pickCase: onPickCase, submit: onSubmit, lookup: onLookup });
     }
   });
   // The start screen shows the active word set; keep it current.

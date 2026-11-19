@@ -27,6 +27,7 @@ js/
   main.js               mounts the tabs
   settings.js           difficulty presets, defaults, saving to localStorage
   data/nouns.js         built-in word list ("Basics")
+  data/nouns-everyday.js extra words of the "Everyday German" set (Basics + these)
   data/sentences.js     sentence templates
   grammar/articles.js   article tables and noun ending rules
   grammar/cases.js      tutorial text for each case
@@ -54,11 +55,14 @@ scripts/serve.js        development server (no caching)
 ## Adding content
 
 - **Your own words:** use the Words tab in the app (no code needed). Sets can be exported and imported as CSV.
-- **A built-in noun:** add a line to `js/data/nouns.js`. Tags decide which sentences it can appear in.
+- **A built-in noun:** add a line to `js/data/nouns.js` (Basics) or `js/data/nouns-everyday.js` (only in
+  Everyday German). Tags decide which sentences it can appear in. Weak nouns (der Junge → des Jungen)
+  are not supported yet.
   Also add its Polish forms to `js/data/nouns-pl.js`; a data test checks they are there.
 - **A sentence:** add a line to `js/data/sentences.js`. Use `{article} {noun}` for the gap and
   `{ist|sind}` for verbs that change with plural.
-  Give it an English (`en`) and Polish (`pl`) translation, and a `why` rule worded in the i18n files.
+  Give it an English (`en`) and Polish (`pl`) translation, a `why` rule worded in the i18n files,
+  and a `clue`: the word that decides the case, which players can tap to see its meaning.
   Every noun kind (person, animal, object, place) needs at least one sentence per case, so any word set works;
   a data test checks this.
 - **A new article type** (e.g. kein, mein): add it to `ARTICLE_TYPES` in `js/grammar/articles.js`.
