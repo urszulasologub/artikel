@@ -36,10 +36,11 @@ export const RULES = {
 
   // `level` is a difficulty preset from settings.js. `timer` (seconds, plus `bonus` seconds per right
   // answer) is optional. Running out of time costs a heart and restarts the round's timer.
+  // `tableMode` overrides the level's grammar table ('open', 'toggle' or 'hidden' = not available).
   rounds: [
     { level: 'easy', articleTypes: ['definite'], points: 10 },
     { level: 'medium', articleTypes: ['definite'], points: 10 },
-    { level: 'medium', articleTypes: ['definite', 'indefinite'], points: 15 },
+    { level: 'medium', articleTypes: ['definite', 'indefinite'], points: 15, tableMode: 'hidden' },
     { level: 'hard', articleTypes: ['definite', 'indefinite'], points: 20 },
     { level: 'hard', articleTypes: ['definite', 'indefinite'], points: 25 },
     { level: 'hard', articleTypes: ['definite', 'indefinite'], points: 25, timer: { seconds: 120, bonus: 6 } },

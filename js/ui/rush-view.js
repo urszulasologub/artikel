@@ -2,12 +2,11 @@
 // combos, a timer in later rounds and high scores. The only choice is which cases to practise.
 
 import { CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
-import { answer as answerGame, createGame, missCase, multiplier, roundConfig, tick } from '../game/engine.js';
+import { answer as answerGame, createGame, missCase, multiplier, roundConfig, roundSettings, tick } from '../game/engine.js';
 import { MAX_NAME_LENGTH, createHighScores } from '../game/high-scores.js';
 import { RULES } from '../game/rules.js';
 import { t } from '../i18n/index.js';
 import { createQuestion } from '../quiz/generator.js';
-import { PRESETS } from '../settings.js';
 import { el } from './dom.js';
 import {
   handleNumberKey,
@@ -66,14 +65,8 @@ export function mountRushView(root, { wordSets, storage }) {
     startClock();
   }
 
-  /** Difficulty of the current round, from its preset, with the player's cases. */
-  function roundSettings() {
-    const round = roundConfig(state.game.round);
-    return { ...PRESETS[round.level], cases: state.cases, articleTypes: round.articleTypes };
-  }
-
   function nextQuestion() {
-    state.settings = roundSettings();
+    state.settings = roundSettings(state.game.round, state.cases);
     const nouns = wordSets.activeSet().nouns;
     state.answer = newAnswer(createQuestion(state.settings, { previousKey: state.answer.question?.key, nouns }));
     render();

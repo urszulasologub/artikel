@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { ARTICLE_TYPES } from '../js/grammar/articles.js';
-import { roundConfig } from '../js/game/engine.js';
+import { roundConfig, roundSettings } from '../js/game/engine.js';
 import { RULES } from '../js/game/rules.js';
 import { PRESETS } from '../js/settings.js';
 
@@ -38,4 +38,19 @@ test('start levels point at real rounds with the same level, and harder starts p
     previousBonus = start.bonus;
   }
   assert.equal(RULES.startLevels[0].round, 0);
+});
+
+test('round 3 has no grammar table at all; rounds 1 and 2 can open it', () => {
+  assert.equal(roundSettings(0, ['nom', 'akk']).tableMode, 'toggle');
+  assert.equal(roundSettings(1, ['nom', 'akk']).tableMode, 'toggle');
+  assert.equal(roundSettings(2, ['nom', 'akk']).tableMode, 'hidden');
+  for (let index = 2; index < RULES.rounds.length + 3; index++) {
+    assert.equal(roundSettings(index, ['nom', 'akk']).tableMode, 'hidden', `round ${index + 1}`);
+  }
+});
+
+test('round settings use the round article types and the chosen cases', () => {
+  const settings = roundSettings(2, ['dat', 'gen']);
+  assert.deepEqual(settings.cases, ['dat', 'gen']);
+  assert.deepEqual(settings.articleTypes, ['definite', 'indefinite']);
 });

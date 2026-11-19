@@ -6,6 +6,7 @@
 //
 // A question costs at most one heart, whatever goes wrong: wrong case, wrong article or running out of time.
 
+import { PRESETS } from '../settings.js';
 import { RULES } from './rules.js';
 
 /**
@@ -38,6 +39,17 @@ export function roundConfig(index, rules = RULES) {
   const { secondsLessPerRound, minSeconds, bonus } = rules.endless;
   const seconds = Math.max(minSeconds, (last.timer?.seconds ?? minSeconds) - extraRounds * secondsLessPerRound);
   return { ...last, timer: { seconds, bonus } };
+}
+
+/**
+ * The question settings for a round: its difficulty preset, the round's own overrides (article types,
+ * table) and the player's chosen cases.
+ */
+export function roundSettings(index, cases, rules = RULES) {
+  const round = roundConfig(index, rules);
+  const settings = { ...PRESETS[round.level], cases, articleTypes: round.articleTypes };
+  if (round.tableMode) settings.tableMode = round.tableMode;
+  return settings;
 }
 
 /** Points multiplier for a number of right answers in a row, e.g. 1.2 for 10. */
