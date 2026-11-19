@@ -29,7 +29,6 @@
   "presets": {
     "easy": "Łatwy",
     "medium": "Średni",
-    "mediumPlus": "Średni+",
     "hard": "Trudny",
     "custom": "Własny"
   },
@@ -46,9 +45,6 @@
     "showCase": "Pokazuj przypadek",
     "showCaseDisabled": "Ukryte, gdy włączone jest „Najpierw wybierz przypadek”",
     "askCase": "Najpierw wybierz przypadek",
-    "answerBy": "Odpowiadanie",
-    "choosing": "Wybór",
-    "typing": "Pisanie",
     "table": "Tabela gramatyczna",
     "tableOpen": "Zawsze otwarta",
     "tableToggle": "Pokaż / ukryj",
@@ -72,9 +68,6 @@
     "whichCase": "Jaki to przypadek?",
     "pickArticle": "Teraz wybierz rodzajnik",
     "key": "Klawisz {n}",
-    "typePlaceholder": "Wpisz właściwą formę „{hint}”",
-    "yourAnswer": "Twoja odpowiedź",
-    "check": "Sprawdź",
     "continue": "Dalej",
     "retryMistakes": "Popraw błędy",
     "seeResults": "Zobacz wynik",

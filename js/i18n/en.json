@@ -29,7 +29,6 @@
   "presets": {
     "easy": "Easy",
     "medium": "Medium",
-    "mediumPlus": "Medium+",
     "hard": "Hard",
     "custom": "Custom"
   },
@@ -46,9 +45,6 @@
     "showCase": "Show the case",
     "showCaseDisabled": "Hidden while \"Choose the case first\" is on",
     "askCase": "Choose the case first",
-    "answerBy": "Answer by",
-    "choosing": "Choosing",
-    "typing": "Typing",
     "table": "Grammar table",
     "tableOpen": "Always open",
     "tableToggle": "Show / hide",
@@ -70,9 +66,6 @@
     "whichCase": "Which case is it?",
     "pickArticle": "Now pick the article",
     "key": "Key {n}",
-    "typePlaceholder": "Type the right form of \"{hint}\"",
-    "yourAnswer": "Your answer",
-    "check": "Check",
     "continue": "Continue",
     "retryMistakes": "Retry mistakes",
     "seeResults": "See results",

@@ -77,7 +77,7 @@ export async function seedBruderQuestion(page) {
   await page.addInitScript(() => {
     if (localStorage.getItem('german-grammar:progress')) return;
     localStorage.setItem('german-grammar:settings', JSON.stringify({
-      showGender: true, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'toggle',
+      showGender: true, showCase: false, askCase: true, tableMode: 'toggle',
       cases: ['akk', 'dat'], articleTypes: ['indefinite'],
     }));
     const question = {

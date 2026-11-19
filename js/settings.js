@@ -4,18 +4,16 @@ import { ARTICLE_TYPES, CASES } from './grammar/articles.js';
 
 const STORAGE_KEY = 'german-grammar:settings';
 
-export const INPUT_MODES = ['choice', 'type'];
 export const TABLE_MODES = ['open', 'toggle', 'hidden'];
 
 // Preset names are in the i18n files under "presets".
 export const PRESETS = {
-  easy: { showGender: true, showCase: true, askCase: false, inputMode: 'choice', tableMode: 'toggle' },
-  medium: { showGender: true, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'toggle' },
-  mediumPlus: { showGender: false, showCase: false, askCase: true, inputMode: 'choice', tableMode: 'hidden' },
-  hard: { showGender: false, showCase: false, askCase: true, inputMode: 'type', tableMode: 'hidden' },
+  easy: { showGender: true, showCase: true, askCase: false, tableMode: 'toggle' },
+  medium: { showGender: true, showCase: false, askCase: true, tableMode: 'toggle' },
+  hard: { showGender: false, showCase: false, askCase: true, tableMode: 'hidden' },
 };
 
-const PRESET_FIELDS = ['showGender', 'showCase', 'askCase', 'inputMode', 'tableMode'];
+const PRESET_FIELDS = ['showGender', 'showCase', 'askCase', 'tableMode'];
 
 export const DEFAULT_SETTINGS = {
   ...PRESETS.easy,
@@ -60,7 +58,6 @@ export function sanitize(input) {
     showGender: typeof input.showGender === 'boolean' ? input.showGender : DEFAULT_SETTINGS.showGender,
     showCase: typeof input.showCase === 'boolean' ? input.showCase : DEFAULT_SETTINGS.showCase,
     askCase: typeof input.askCase === 'boolean' ? input.askCase : DEFAULT_SETTINGS.askCase,
-    inputMode: INPUT_MODES.includes(input.inputMode) ? input.inputMode : DEFAULT_SETTINGS.inputMode,
     tableMode: TABLE_MODES.includes(input.tableMode) ? input.tableMode : DEFAULT_SETTINGS.tableMode,
     cases: cases.length ? cases : DEFAULT_SETTINGS.cases,
     articleTypes: articleTypes.length ? articleTypes : DEFAULT_SETTINGS.articleTypes,

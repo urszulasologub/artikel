@@ -22,6 +22,14 @@
   --yellow-edge: #e5a000;
   --orange: #ff9600;
 
+  /* Brand: warm amber. Green and red only mean right and wrong. */
+  --brand: #ffb020;
+  --brand-edge: #e08e00;
+  --brand-soft: #fff3d9;
+  --brand-line: #ffd27a;
+  --brand-text: #b86b00;
+  --on-brand: #3d2800;
+
   --ok: var(--green-edge);
   --ok-bg: var(--green-soft);
   --bad: var(--red-edge);
@@ -130,7 +138,7 @@ p { margin: 0 0 8px; }
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--green);
+  color: var(--brand-text);
   text-decoration: none;
   font-weight: 900;
   font-size: 1.6rem;
@@ -154,7 +162,7 @@ p { margin: 0 0 8px; }
   cursor: pointer;
 }
 .lang-switch button + button { border-left: 2px solid var(--line); }
-.lang-switch button[aria-pressed="true"] { background: var(--blue-soft); color: var(--blue); }
+.lang-switch button[aria-pressed="true"] { background: var(--brand-soft); color: var(--brand-text); }
 
 .icon-btn {
   width: 44px;
@@ -165,7 +173,7 @@ p { margin: 0 0 8px; }
   border-radius: 14px;
   box-shadow: 0 3px 0 var(--line);
   background: var(--surface);
-  color: var(--blue);
+  color: var(--brand-text);
   cursor: pointer;
 }
 .icon-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--line); }
@@ -193,7 +201,7 @@ p { margin: 0 0 8px; }
   border-radius: 12px;
 }
 .tabs a:hover { background: var(--soft); }
-.tabs a.active { color: var(--blue); background: var(--blue-soft); border-color: #84d8ff; }
+.tabs a.active { color: var(--brand-text); background: var(--brand-soft); border-color: var(--brand-line); }
 
 /* ---------- Panels ---------- */
 .panel {
@@ -229,7 +237,7 @@ details.panel[open] > summary { margin-bottom: 4px; }
 
 .checks { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; min-height: 34px; }
-.check input { width: 20px; height: 20px; accent-color: var(--green); margin: 0; }
+.check input { width: 20px; height: 20px; accent-color: var(--brand-edge); margin: 0; }
 .check:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
 .check input:disabled { cursor: not-allowed; }
 
@@ -253,14 +261,17 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .btn:disabled { cursor: default; }
 
 .btn.primary {
-  --edge: var(--green-edge);
-  background: var(--green);
-  border-color: var(--green);
-  color: #fff;
+  --edge: var(--brand-edge);
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-.btn.primary:hover:not(:disabled) { background: #61e002; }
+.btn.primary:hover:not(:disabled) { background: #ffbe45; }
+/* Continue after a right answer stays green: green means "correct". */
+.btn.primary.success { --edge: var(--green-edge); background: var(--green); border-color: var(--green); color: #fff; }
+.btn.primary.success:hover:not(:disabled) { background: #61e002; }
 .btn.primary.danger { --edge: var(--red-edge); background: var(--red); border-color: var(--red); }
 .btn.primary.danger:hover:not(:disabled) { background: #ff6262; }
 .btn.primary.warning { --edge: var(--yellow-edge); background: var(--yellow); border-color: var(--yellow); }
@@ -281,7 +292,7 @@ details.panel[open] > summary { margin-bottom: 4px; }
   cursor: pointer;
 }
 .segment:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--line); }
-.segment.active { background: var(--blue-soft); border-color: #84d8ff; box-shadow: 0 3px 0 #84d8ff; color: var(--blue); }
+.segment.active { background: var(--brand-soft); border-color: var(--brand-line); box-shadow: 0 3px 0 var(--brand-line); color: var(--brand-text); }
 .segment.static { cursor: default; }
 
 /* ---------- Quiz card ---------- */
@@ -343,8 +354,6 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .gap.shake { animation: shake 380ms ease; }
 
 .noun { font-weight: 900; }
-/* Which word goes in the gap when typing, e.g. "(ein)". */
-.gap-hint { color: var(--muted); font-weight: 700; font-size: 0.8em; }
 
 /* Words you can tap to see what they mean: the noun and the clue word (verb or preposition). */
 .word-tap {
@@ -359,13 +368,13 @@ details.panel[open] > summary { margin-bottom: 4px; }
   text-decoration-color: var(--faint);
 }
 .word-tap.clue { font-weight: 800; }
-.word-tap:hover, .word-tap.active { text-decoration-color: var(--blue); text-decoration-style: solid; }
+.word-tap:hover, .word-tap.active { text-decoration-color: var(--brand-edge); text-decoration-style: solid; }
 .word-info {
   margin: -6px 0 0;
   padding: 8px 12px;
   border-radius: 12px;
-  background: var(--blue-soft);
-  color: var(--blue-edge);
+  background: var(--brand-soft);
+  color: var(--brand-text);
   font-weight: 600;
   animation: rise 200ms ease;
 }
@@ -396,7 +405,7 @@ details.panel[open] > summary { margin-bottom: 4px; }
 
 .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .choice { font-size: 1.2rem; }
-.choice:hover:not(:disabled) { border-color: #84d8ff; --edge: #84d8ff; background: var(--blue-soft); color: var(--blue); }
+.choice:hover:not(:disabled) { border-color: var(--brand-line); --edge: var(--brand-line); background: var(--brand-soft); color: var(--brand-text); }
 .choice.ok { --edge: var(--green); background: var(--ok-bg); border-color: var(--green); color: var(--ok); }
 .choice.bad { --edge: var(--red); background: var(--bad-bg); border-color: var(--red); color: var(--bad); }
 .choice:disabled:not(.ok):not(.bad) { color: var(--faint); }
@@ -414,21 +423,19 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .case-choice.pop { animation: pop 380ms ease; }
 .case-choice:disabled:not(.ok):not(.bad) { opacity: 0.4; }
 
-.type-form { display: flex; gap: 10px; }
-.answer-input {
+.inline-form { display: flex; gap: 10px; }
+.text-input {
   flex: 1;
   min-width: 0;
   font: inherit;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   padding: 10px 14px;
   border-radius: var(--radius);
   border: 2px solid var(--line);
   background: var(--soft);
   color: var(--ink);
 }
-.answer-input:focus { border-color: var(--blue); background: var(--surface); outline: none; }
-.answer-input.ok { border-color: var(--green); color: var(--ok); background: var(--ok-bg); }
-.answer-input.bad { border-color: var(--red); color: var(--bad); background: var(--bad-bg); text-decoration: line-through; }
+.text-input:focus { border-color: var(--brand-edge); background: var(--surface); outline: none; }
 
 .feedback {
   padding: 14px 16px;
@@ -446,7 +453,7 @@ details.panel[open] > summary { margin-bottom: 4px; }
 /* ---------- Round summary ---------- */
 .summary { text-align: center; justify-items: center; }
 .summary-score { font-size: 1.4rem; color: var(--faint); margin: 8px 0 0; font-weight: 800; animation: pop 500ms cubic-bezier(.3, 1.6, .5, 1); }
-.summary-score strong { font-size: 4.5rem; color: var(--green); line-height: 1; font-weight: 900; }
+.summary-score strong { font-size: 4.5rem; color: var(--brand-text); line-height: 1; font-weight: 900; }
 .summary-message { font-size: 1.4rem; font-weight: 900; color: var(--yellow-edge); }
 .weak-spot { padding: 8px 16px; border-radius: 14px; background: var(--soft); border: 2px solid var(--line); }
 .fixed { color: var(--ok); font-weight: 800; margin: 0; }
@@ -458,14 +465,14 @@ details.panel[open] > summary { margin-bottom: 4px; }
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--blue);
+  color: var(--brand-text);
   background: none;
   border: 0;
   padding: 6px 4px;
   cursor: pointer;
   white-space: nowrap;
 }
-.text-btn:hover { color: var(--blue-edge); }
+.text-btn:hover { color: var(--on-brand); }
 .retry-banner { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); font-weight: 700; }
 .retry-banner strong {
   background: var(--yellow);
@@ -551,7 +558,7 @@ details.panel[open] > summary { margin-bottom: 4px; }
   min-width: 0;
 }
 .field-label input::placeholder { color: var(--faint); font-weight: 600; }
-.field-label input:focus, .field-label select:focus, .set-picker select:focus { border-color: var(--blue); background: var(--surface); outline: none; }
+.field-label input:focus, .field-label select:focus, .set-picker select:focus { border-color: var(--brand-edge); background: var(--surface); outline: none; }
 
 .set-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .set-actions .btn { min-height: 42px; padding: 6px 14px; font-size: 0.9rem; }
@@ -568,7 +575,7 @@ details.panel[open] > summary { margin-bottom: 4px; }
 .message.warning { background: #fff4d6; color: #a06c00; }
 .message.error { background: var(--bad-bg); color: var(--bad); }
 
-.csv-help summary, .more-forms summary { cursor: pointer; color: var(--blue); font-weight: 800; font-size: 0.9rem; }
+.csv-help summary, .more-forms summary { cursor: pointer; color: var(--brand-text); font-weight: 800; font-size: 0.9rem; }
 .csv-help p { margin: 6px 0; color: var(--muted); font-size: 0.9rem; }
 .csv-help pre { margin: 0; padding: 10px 12px; background: var(--soft); border-radius: 10px; font-size: 0.85rem; overflow-x: auto; }
 

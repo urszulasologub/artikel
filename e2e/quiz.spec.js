@@ -79,23 +79,6 @@ test('a wrong case marks the right one and still allows choosing an article', as
   app.expectNoErrors();
 });
 
-test('hard: pick the case, then type the article', async ({ page }) => {
-  const app = await openApp(page);
-  await choosePreset(page, 'Hard');
-  await setCases(page, ['Akkusativ', 'Dativ']);
-
-  for (let i = 0; i < 3; i++) {
-    await card(page).locator('.case-choice').nth(i % 2).click();
-    const input = card(page).getByRole('textbox', { name: 'Your answer' });
-    await expect(input).toBeEnabled();
-    await input.fill(i % 2 ? 'dem' : 'den');
-    await input.press('Enter');
-    await expect(card(page).locator('.feedback')).toBeVisible();
-    await pressContinue(page);
-  }
-  app.expectNoErrors();
-});
-
 test('switching "Choose the case first" on and off', async ({ page }) => {
   const app = await openApp(page);
   await choosePreset(page, 'Easy');
@@ -124,7 +107,7 @@ test('changing settings after picking a case gives a fresh question', async ({ p
   app.expectNoErrors();
 });
 
-test('medium shows the gender and asks for the case; medium+ hides the gender', async ({ page }) => {
+test('medium shows the gender and asks for the case; hard hides the gender and the table', async ({ page }) => {
   const app = await openApp(page);
   await setCases(page, ['Nominativ', 'Dativ']);
 
@@ -132,9 +115,10 @@ test('medium shows the gender and asks for the case; medium+ hides the gender', 
   await expect(card(page).locator('.hints .tag')).toHaveCount(1); // gender tag only, no case tag
   await expect(card(page).locator('.case-choice')).toHaveCount(2);
 
-  await choosePreset(page, 'Medium+');
+  await choosePreset(page, 'Hard');
   await expect(card(page).locator('.hints .tag')).toHaveCount(0);
   await expect(card(page).locator('.case-choice')).toHaveCount(2);
+  await expect(page.locator('#view-practice table.declension')).toHaveCount(0);
   app.expectNoErrors();
 });
 
@@ -184,7 +168,6 @@ test('settings are remembered after reload', async ({ page }) => {
   await setCases(page, ['Dativ', 'Genitiv']);
 
   await page.reload();
-  await expect(card(page).getByRole('textbox', { name: 'Your answer' })).toHaveCount(0); // case step comes first
   await expect(card(page).locator('.case-choice')).toHaveText([/Dativ/, /Genitiv/]);
   app.expectNoErrors();
 });
@@ -333,22 +316,6 @@ test('a right answer keeps the page still; a wrong one scrolls to Continue', asy
   app.expectNoErrors();
 });
 
-test('when typing, the gap says which word to use', async ({ page }) => {
-  await seedBruderQuestion(page);
-  const app = await openApp(page);
-  await settingsPanel(page).getByLabel('Typing', { exact: true }).check();
-
-  await expect(card(page).locator('.gap-hint')).toHaveText('(ein)');
-  await card(page).locator('.case-choice', { hasText: 'Dativ' }).click();
-  const input = card(page).getByRole('textbox', { name: 'Your answer' });
-  await expect(input).toHaveAttribute('placeholder', 'Type the right form of "ein"');
-  await input.fill('einem');
-  await input.press('Enter');
-  await expect(card(page).locator('.feedback.ok')).toBeVisible();
-  await expect(card(page).locator('.gap-hint')).toHaveCount(0);
-  app.expectNoErrors();
-});
-
 test('tapping the noun or the clue word shows its meaning', async ({ page }) => {
   await seedBruderQuestion(page); // "Ich helfe ___ Bruder."
   const app = await openApp(page);
@@ -362,15 +329,12 @@ test('tapping the noun or the clue word shows its meaning', async ({ page }) => 
   app.expectNoErrors();
 });
 
-test('looking up a word keeps the typed answer', async ({ page }) => {
-  await seedBruderQuestion(page);
-  const app = await openApp(page);
-  await settingsPanel(page).getByLabel('Typing', { exact: true }).check();
-  await card(page).locator('.case-choice', { hasText: 'Dativ' }).click();
 
-  const input = card(page).getByRole('textbox', { name: 'Your answer' });
-  await input.fill('ein');
-  await card(page).getByRole('button', { name: 'Bruder' }).click();
-  await expect(input).toHaveValue('ein');
+test('there is no typing option: answers are always chosen', async ({ page }) => {
+  const app = await openApp(page);
+  await expect(settingsPanel(page).getByLabel('Typing')).toHaveCount(0);
+  await expect(settingsPanel(page).getByRole('button', { name: 'Medium+' })).toHaveCount(0);
+  await expect(settingsPanel(page).locator('.segments .segment')).toHaveText(['Easy', 'Medium', 'Hard']);
+  await expect(card(page).getByRole('textbox')).toHaveCount(0);
   app.expectNoErrors();
 });

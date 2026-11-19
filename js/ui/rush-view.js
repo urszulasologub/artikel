@@ -10,7 +10,6 @@ import { createQuestion } from '../quiz/generator.js';
 import { PRESETS } from '../settings.js';
 import { el } from './dom.js';
 import {
-  awaitingCase,
   handleNumberKey,
   isPartial,
   newAnswer,
@@ -76,9 +75,6 @@ export function mountRushView(root, { wordSets, storage }) {
     const nouns = wordSets.activeSet().nouns;
     state.answer = newAnswer(createQuestion(state.settings, { previousKey: state.answer.question?.key, nouns }));
     render();
-    if (state.settings.inputMode === 'type' && !awaitingCase(state.answer, state.settings)) {
-      cardSlot.querySelector('.answer-input')?.focus({ preventScroll: true });
-    }
   }
 
   function next() {
@@ -101,7 +97,7 @@ export function mountRushView(root, { wordSets, storage }) {
     answer.justPickedCase = true;
     render();
     answer.justPickedCase = false;
-    cardSlot.querySelector('.choice, .answer-input')?.focus({ preventScroll: true });
+    cardSlot.querySelector('.choice')?.focus({ preventScroll: true });
   }
 
   function onSubmit(input) {
@@ -345,7 +341,7 @@ export function mountRushView(root, { wordSets, storage }) {
   function renderCard() {
     const { answer, settings, game, roundBanner, effects } = state;
     const handlers = { pickCase: onPickCase, submit: onSubmit, lookup: onLookup };
-    const nextClass = { ok: '', partial: 'warning', bad: 'danger' }[resultClass(answer)];
+    const nextClass = { ok: 'success', partial: 'warning', bad: 'danger' }[resultClass(answer)];
     const round = roundBanner !== null && roundConfig(roundBanner);
     return el('section', { class: `panel card rush-card${effects.heartLost ? ' hit' : ''}`, 'aria-live': 'polite' },
       round && el('div', { class: 'round-banner' },
@@ -363,6 +359,7 @@ export function mountRushView(root, { wordSets, storage }) {
     const canSave = rank === null && highScores.qualifies(game.score);
     const nameInput = el('input', {
       type: 'text',
+      class: 'text-input',
       maxLength: MAX_NAME_LENGTH,
       value: loadName(storage),
       placeholder: t('rush.namePlaceholder'),
@@ -383,7 +380,7 @@ export function mountRushView(root, { wordSets, storage }) {
         },
       },
         el('p', { class: 'fixed' }, t('rush.newHighScore')),
-        el('div', { class: 'type-form' }, nameInput, el('button', { type: 'submit', class: 'btn primary' }, t('rush.save')))),
+        el('div', { class: 'inline-form' }, nameInput, el('button', { type: 'submit', class: 'btn primary' }, t('rush.save')))),
       rank !== null && rank >= 0 && el('p', { class: 'fixed' }, t('rush.savedRank', { rank: rank + 1 })),
       el('div', { class: 'set-actions' },
         el('button', { type: 'button', class: 'btn primary', onClick: start }, t('rush.playAgain')),

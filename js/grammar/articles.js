@@ -45,14 +45,12 @@ export function einWord(base, { stem = base, plural = true } = {}) {
   return forms;
 }
 
-// Each article type: a label for settings, a `hint` shown next to the gap when typing
-// ("Ich helfe ___ (ein) Bruder"), and its forms. `null` means the form does not exist.
-// To add e.g. possessives: { label: 'mein / meine', hint: 'mein', forms: einWord('mein') }.
+// Each article type: a label for settings and its forms. `null` means the form does not exist.
+// To add e.g. possessives: { label: 'mein / meine', forms: einWord('mein') }.
 // (Sentence translations would then also need to say "my" instead of "a".)
 export const ARTICLE_TYPES = {
   definite: {
     label: 'der / die / das',
-    hint: 'der/die/das',
     forms: {
       nom: { m: 'der', f: 'die', n: 'das', pl: 'die' },
       akk: { m: 'den', f: 'die', n: 'das', pl: 'die' },
@@ -62,7 +60,6 @@ export const ARTICLE_TYPES = {
   },
   indefinite: {
     label: 'ein / eine',
-    hint: 'ein',
     forms: einWord('ein', { plural: false }),
   },
 };

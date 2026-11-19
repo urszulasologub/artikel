@@ -1,11 +1,11 @@
 // One question, shared by the Practice tab and Artikel Rush: the sentence with its gap, hints,
-// the optional "which case?" step, the answer buttons or typing box, and the feedback.
+// the optional "which case?" step, the answer buttons, and the feedback.
 //
 // The answer state is a plain object (see newAnswer) owned by the view. pickCase() and submitAnswer()
 // update it; the view then plays sounds, keeps score and re-renders.
 
 import { SENTENCES_BY_ID } from '../data/sentences.js';
-import { ARTICLE_TYPES, CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
+import { CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
 import { language, t } from '../i18n/index.js';
 import { checkAnswer, explain, translateQuestion } from '../quiz/generator.js';
 import { nounMeaning } from '../quiz/translate.js';
@@ -18,8 +18,6 @@ export function newAnswer(question) {
     answered: false,
     userAnswer: '',
     caseAnswer: null,
-    // Text typed so far, kept so a re-render (e.g. after looking up a word) doesn't clear it.
-    draft: '',
     // Which word's meaning is shown: 'noun', 'clue' or null.
     lookup: null,
     caseCorrect: true,
@@ -81,7 +79,7 @@ export function handleNumberKey(event, answer, settings, handlers) {
   if (awaitingCase(answer, settings)) {
     const grammarCase = caseOptions(answer.question, settings)[index];
     if (grammarCase) handlers.pickCase(grammarCase);
-  } else if (settings.inputMode === 'choice') {
+  } else {
     const choice = answer.question.choices[index];
     if (choice) handlers.submit(choice);
   }
@@ -99,15 +97,12 @@ export function renderQuestion(answer, settings, handlers) {
   const waiting = awaitingCase(answer, settings);
   // With "choose the case first", the case stays hidden until it has been picked.
   const caseKnown = asking ? answer.caseAnswer !== null || answered : settings.showCase;
-  const typing = settings.inputMode === 'type';
 
   const nounClass = settings.showGender || answered ? `noun g-${question.gender}` : 'noun';
   const animation = justAnswered ? (articleCorrect ? ' pop' : ' shake') : '';
   const gap = answered
     ? el('span', { class: `gap filled ${articleCorrect ? 'ok' : 'bad'}${animation}` }, question.answer)
     : el('span', { class: caseKnown ? `gap case-gap c-${question.case}` : 'gap' }, ' ');
-  // When typing, say which word to put in the gap ("Ich helfe ___ (ein) Bruder"), like a textbook.
-  const hint = typing && !answered && el('span', { class: 'gap-hint' }, `(${ARTICLE_TYPES[question.articleType].hint})`);
 
   const hints = [
     caseKnown && el('span', { class: `tag case-tag c-${question.case}` },
@@ -141,13 +136,13 @@ export function renderQuestion(answer, settings, handlers) {
     : el('span', { class: nounClass }, question.nounText);
 
   return [
-    el('p', { class: 'sentence' }, beforeParts, gap, hint && ' ', hint, ' ', noun, afterParts),
+    el('p', { class: 'sentence' }, beforeParts, gap, ' ', noun, afterParts),
     answer.lookup && renderWordInfo(answer, clue, meaning),
     answered && renderTranslation(question, 'p'),
     el('div', { class: 'hints' }, hints),
     asking && renderCaseStep(answer, settings, handlers.pickCase),
     !waiting && asking && el('p', { class: 'step-label' }, t('quiz.pickArticle')),
-    !waiting && (typing ? renderTyping(answer, handlers.submit) : renderChoices(answer, handlers.submit)),
+    !waiting && renderChoices(answer, handlers.submit),
     answered && renderFeedback(answer),
   ].filter(Boolean);
 }
@@ -221,31 +216,6 @@ function renderChoices({ question, answered, userAnswer }, submit) {
       onClick: () => submit(choice),
     }, choice);
   }));
-}
-
-function renderTyping(answer, submit) {
-  const { question, answered, userAnswer, articleCorrect } = answer;
-  const input = el('input', {
-    type: 'text',
-    class: `answer-input${answered ? (articleCorrect ? ' ok' : ' bad') : ''}`,
-    value: answered ? userAnswer : answer.draft,
-    onInput: (event) => {
-      answer.draft = event.target.value;
-    },
-    disabled: answered,
-    placeholder: t('quiz.typePlaceholder', { hint: ARTICLE_TYPES[question.articleType].hint }),
-    autocomplete: 'off',
-    autocapitalize: 'off',
-    spellcheck: false,
-    'aria-label': t('quiz.yourAnswer'),
-  });
-  return el('form', {
-    class: 'type-form',
-    onSubmit: (event) => {
-      event.preventDefault();
-      submit(input.value);
-    },
-  }, input, !answered && el('button', { type: 'submit', class: 'btn primary' }, t('quiz.check')));
 }
 
 function feedbackTitle({ question, correct, caseCorrect, articleCorrect }) {

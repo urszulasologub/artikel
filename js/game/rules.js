@@ -31,7 +31,7 @@ export const RULES = {
     { level: 'easy', articleTypes: ['definite'], points: 10 },
     { level: 'medium', articleTypes: ['definite'], points: 10 },
     { level: 'medium', articleTypes: ['definite', 'indefinite'], points: 15 },
-    { level: 'mediumPlus', articleTypes: ['definite', 'indefinite'], points: 20 },
+    { level: 'hard', articleTypes: ['definite', 'indefinite'], points: 20 },
     { level: 'hard', articleTypes: ['definite', 'indefinite'], points: 25 },
     { level: 'hard', articleTypes: ['definite', 'indefinite'], points: 25, timer: { seconds: 120, bonus: 6 } },
     { level: 'hard', articleTypes: ['definite', 'indefinite'], points: 30, timer: { seconds: 90, bonus: 5 } },

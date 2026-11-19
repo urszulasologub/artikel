@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { SENTENCES_BY_ID } from '../js/data/sentences.js';
 import { nounMeaning, nounPhrase, translateEnglish, translatePolish } from '../js/quiz/translate.js';
 
 const man = { word: 'Mann', en: 'man', enPlural: 'men' };
@@ -39,4 +40,10 @@ test('meanings follow the language for built-in words only', () => {
   assert.equal(nounMeaning(man, 'en'), 'man');
   assert.equal(nounMeaning(man, 'pl'), 'mężczyzna');
   assert.equal(nounMeaning({ word: 'Kanne', en: 'dzbanek' }, 'pl'), 'dzbanek');
+});
+
+test('English: "This is" becomes "These are" in the plural', () => {
+  const template = SENTENCES_BY_ID['nom-this-is'].en;
+  assert.equal(translateEnglish(template, { noun: man, plural: true, articleType: 'definite' }), 'These are the men.');
+  assert.equal(translateEnglish(template, { noun: man, plural: false, articleType: 'indefinite' }), 'This is a man.');
 });

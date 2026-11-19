@@ -9,7 +9,6 @@ import { PRESETS, activePreset, applyPreset, loadSettings, saveSettings } from '
 import { el } from './dom.js';
 import { genderMark } from './marks.js';
 import {
-  awaitingCase,
   handleNumberKey,
   isPartial,
   newAnswer,
@@ -76,7 +75,7 @@ export function mountQuizView(root, { wordSets }) {
     answer.justPickedCase = true;
     render();
     answer.justPickedCase = false;
-    cardSlot.querySelector('.choice, .answer-input')?.focus({ preventScroll: true });
+    cardSlot.querySelector('.choice')?.focus({ preventScroll: true });
   }
 
   function onSubmit(input) {
@@ -127,9 +126,6 @@ export function mountQuizView(root, { wordSets }) {
       state.tableOpen = !state.tableOpen;
       render();
     }));
-    if (settings.inputMode === 'type' && !answer.answered && !awaitingCase(answer, settings)) {
-      cardSlot.querySelector('input')?.focus({ preventScroll: true });
-    }
   }
 
   document.addEventListener('keydown', (event) => {
@@ -216,10 +212,6 @@ function renderSettings(settings, update, open, onToggle, wordSets) {
       }),
       checkbox(t('settings.askCase'), settings.askCase, (checked) => update({ askCase: checked })),
     )),
-    field(t('settings.answerBy'), radios('inputMode', settings.inputMode, [
-      ['choice', t('settings.choosing')],
-      ['type', t('settings.typing')],
-    ], (value) => update({ inputMode: value }))),
     field(t('settings.table'), radios('tableMode', settings.tableMode, [
       ['open', t('settings.tableOpen')],
       ['toggle', t('settings.tableToggle')],
@@ -230,7 +222,7 @@ function renderSettings(settings, update, open, onToggle, wordSets) {
 
 function renderCard(state, { handlers, next, newRound }) {
   const { answer, settings } = state;
-  const nextClass = { ok: '', partial: 'warning', bad: 'danger' }[resultClass(answer)];
+  const nextClass = { ok: 'success', partial: 'warning', bad: 'danger' }[resultClass(answer)];
   return el(
     'section',
     { class: 'panel card', 'aria-live': 'polite' },

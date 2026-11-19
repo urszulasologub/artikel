@@ -13,9 +13,10 @@ test('every preset is different, so the active one can be detected', () => {
 });
 
 test('sanitize drops unknown values and keeps lists non-empty', () => {
-  const result = sanitize({ cases: ['dat', 'bogus', 'akk'], articleTypes: [], inputMode: 'voice' });
+  const result = sanitize({ cases: ['dat', 'bogus', 'akk'], articleTypes: [], tableMode: 'sideways', inputMode: 'type' });
   assert.deepEqual(result.cases, ['akk', 'dat']);
   assert.deepEqual(result.articleTypes, DEFAULT_SETTINGS.articleTypes);
-  assert.equal(result.inputMode, DEFAULT_SETTINGS.inputMode);
+  assert.equal(result.tableMode, DEFAULT_SETTINGS.tableMode);
+  assert.equal('inputMode' in result, false, 'the old typing option is dropped');
   assert.equal(result.askCase, DEFAULT_SETTINGS.askCase);
 });
