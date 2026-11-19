@@ -17,11 +17,12 @@ export function createHighScores(storage) {
     qualifies: (score) => score > 0 && (scores.length < MAX_HIGH_SCORES || score > scores.at(-1).score),
 
     /**
-     * Adds a score and keeps the best ones.
+     * Adds a score and keeps the best ones. `start` is the level the game started at.
+     * @param {{ name: string, score: number, round: number, start?: string }} result
      * @returns {number} its position in the list (0 = best), or -1 when it did not make the list
      */
-    add({ name, score, round }) {
-      const entry = { name: cleanName(name), score, round, date: new Date().toISOString() };
+    add({ name, score, round, start = 'easy' }) {
+      const entry = { name: cleanName(name), score, round, start, date: new Date().toISOString() };
       scores = [...scores, entry].sort((a, b) => b.score - a.score).slice(0, MAX_HIGH_SCORES);
       try {
         storage?.setItem(STORAGE_KEY, JSON.stringify(scores));

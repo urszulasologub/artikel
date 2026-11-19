@@ -28,3 +28,14 @@ test('hearts and combo settings make sense', () => {
   assert.ok(RULES.combo.max >= 1);
   assert.ok(RULES.minCases >= 1);
 });
+
+test('start levels point at real rounds with the same level, and harder starts pay more', () => {
+  let previousBonus = 0;
+  for (const start of RULES.startLevels) {
+    assert.ok(PRESETS[start.level], `start level "${start.level}" is not a difficulty preset`);
+    assert.equal(RULES.rounds[start.round]?.level, start.level, `start at "${start.level}" points to another level`);
+    assert.ok(start.bonus >= 1 && start.bonus > previousBonus, `start at "${start.level}": bonus must grow`);
+    previousBonus = start.bonus;
+  }
+  assert.equal(RULES.startLevels[0].round, 0);
+});

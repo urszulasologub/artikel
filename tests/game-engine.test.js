@@ -10,6 +10,10 @@ const RULES = {
   hearts: { start: 3, max: 3, regainEvery: 4 },
   combo: { every: 2, bonus: 0.5, max: 2 },
   partial: { pointsShare: 0.5 },
+  startLevels: [
+    { level: 'easy', round: 0, bonus: 1 },
+    { level: 'hard', round: 1, bonus: 1.5 },
+  ],
   rounds: [
     { level: 'easy', articleTypes: ['definite'], points: 10 },
     { level: 'hard', articleTypes: ['definite'], points: 20, timer: { seconds: 30, bonus: 5 } },
@@ -153,4 +157,38 @@ test('a wrong case on the last heart ends the game', () => {
 test('with lostForWrongCase off, a wrong case costs nothing', () => {
   const game = createGame(RULES);
   assert.equal(missCase(game, RULES).game, game);
+});
+
+test('starting at a harder level skips rounds and gives a bonus until the first mistake', () => {
+  let game = createGame(RULES, 'hard');
+  assert.equal(game.round, 1);
+  assert.equal(game.timeLeft, 30_000);
+  assert.equal(game.startBonus, 1.5);
+
+  ({ game } = play(game, ['right']));
+  assert.equal(game.score, 30); // 20 points × 1.5
+
+  const { game: after, events } = play(game, ['wrong', 'right']);
+  assert.ok(types(events).includes('bonusLost'));
+  assert.equal(after.startBonus, 1);
+  assert.equal(after.score, 30 + 20); // no bonus after the mistake
+});
+
+test('the bonus and the combo multiply each other', () => {
+  const { game } = play(createGame(RULES, 'hard'), ['right', 'right']);
+  assert.equal(game.score, 30 + Math.round(20 * 1.5 * 1.5)); // second answer: combo ×1.5, bonus ×1.5
+});
+
+test('a wrong case, a half-right answer or running out of time also ends the bonus', () => {
+  const caseRules = { ...RULES, hearts: { ...RULES.hearts, lostForWrongCase: true } };
+  assert.equal(missCase(createGame(caseRules, 'hard'), caseRules).game.startBonus, 1);
+  assert.equal(answer(createGame(RULES, 'hard'), 'partial', RULES).game.startBonus, 1);
+  assert.equal(tick(createGame(RULES, 'hard'), 40_000, RULES).game.startBonus, 1);
+});
+
+test('starting at the first level has no bonus, and an unknown level falls back to it', () => {
+  const { game, events } = play(createGame(RULES, 'easy'), ['wrong']);
+  assert.equal(game.startBonus, 1);
+  assert.ok(!types(events).includes('bonusLost'));
+  assert.equal(createGame(RULES, 'nonsense').round, 0);
 });

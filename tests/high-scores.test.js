@@ -39,3 +39,10 @@ test('broken storage starts empty', () => {
   assert.deepEqual(createHighScores(storage).list(), []);
   assert.deepEqual(createHighScores(null).list(), []);
 });
+
+test('scores remember where the game started', () => {
+  const scores = createHighScores(storage);
+  scores.add({ name: 'A', score: 10, round: 2, start: 'hard' });
+  scores.add({ name: 'B', score: 5, round: 1 });
+  assert.deepEqual(createHighScores(storage).list().map((s) => s.start), ['hard', 'easy']);
+});

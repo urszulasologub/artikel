@@ -670,6 +670,21 @@ details.panel[open] > summary { margin-bottom: 4px; }
 }
 .combo.bump { animation: bump 450ms ease; }
 
+/* Start bonus: on the "Start at" buttons, and in the score bar until the first mistake. */
+.start-bonus { margin-left: 6px; color: var(--green-edge); font-weight: 900; }
+.start-bonus-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: var(--green-soft);
+  border: 2px solid var(--green);
+  color: var(--green-edge);
+  font-weight: 900;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.flash.bonus { top: 22px; font-size: 1rem; }
+.start-cell { color: var(--muted); font-size: 0.9rem; }
+
 .round-label { font-weight: 800; color: var(--muted); }
 .round-progress { color: var(--faint); }
 

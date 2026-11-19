@@ -163,3 +163,27 @@ test('a wrong case costs one heart at once, and a wrong article on the same ques
   await expect(rush(page).locator('.heart:not(.empty)')).toHaveCount(2);
   app.expectNoErrors();
 });
+
+test('starting at Hard skips to round 4 with a bonus that ends at the first mistake', async ({ page }) => {
+  const app = await openRush(page);
+  await rush(page).getByRole('button', { name: /^Hard/ }).click();
+  await expect(rush(page).getByRole('button', { name: /^Hard/ })).toHaveAttribute('aria-pressed', 'true');
+  await rush(page).getByRole('button', { name: 'Start' }).click();
+
+  await expect(rush(page).locator('.round-banner')).toContainText('Round 4');
+  await expect(rush(page).locator('.start-bonus-badge')).toHaveText('Bonus ×1.5');
+
+  // Answer until the first mistake; the bonus badge then goes away.
+  const card = rush(page).locator('.rush-card');
+  for (let i = 0; i < 20 && (await rush(page).locator('.start-bonus-badge').count()); i++) {
+    await card.locator('.case-choice').first().click();
+    await card.locator('.choice').first().click();
+    await card.locator('.next').click();
+  }
+  await expect(rush(page).locator('.start-bonus-badge')).toHaveCount(0);
+
+  // The choice is remembered for next time.
+  await page.reload();
+  await expect(rush(page).getByRole('button', { name: /^Hard/ })).toHaveAttribute('aria-pressed', 'true');
+  app.expectNoErrors();
+});

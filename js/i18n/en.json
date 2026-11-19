@@ -124,7 +124,8 @@
     "rules": [
       "Each round has 10 questions. Easy first, then harder.",
       "You have 3 hearts. A wrong case, a wrong article or running out of time costs one, but never more than one per question. Every 10 right answers win one back.",
-      "Answer right in a row to multiply your points."
+      "Answer right in a row to multiply your points.",
+      "Skip the easy rounds for a points bonus, until your first mistake."
     ],
     "casesLabel": "Cases (choose at least {min})",
     "words": "Words: {name}, {count}.",
@@ -157,7 +158,12 @@
     "noScores": "No scores yet. Be the first!",
     "name": "Name",
     "score": "Score",
-    "round": "Round"
+    "round": "Round",
+    "startAt": "Start at",
+    "startHint": "Start higher for a points bonus that lasts until your first mistake.",
+    "bonus": "Bonus ×{bonus}",
+    "bonusTitle": "Start bonus: lost at your first mistake",
+    "bonusLost": "Bonus lost!"
   },
   "learn": {
     "title": "How cases work",

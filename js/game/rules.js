@@ -25,6 +25,15 @@ export const RULES = {
   // (The heart for the wrong case is set by hearts.lostForWrongCase.)
   partial: { pointsShare: 0.5 },
 
+  // Where a game can start: `round` is an index into `rounds` below, and `level` names it on the start
+  // screen (a difficulty preset). Skipping easy rounds multiplies all points by `bonus` until the first
+  // mistake (wrong case, wrong article, half-right or running out of time).
+  startLevels: [
+    { level: 'easy', round: 0, bonus: 1 },
+    { level: 'medium', round: 1, bonus: 1.2 },
+    { level: 'hard', round: 3, bonus: 1.5 },
+  ],
+
   // `level` is a difficulty preset from settings.js. `timer` (seconds, plus `bonus` seconds per right
   // answer) is optional. Running out of time costs a heart and restarts the round's timer.
   rounds: [

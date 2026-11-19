@@ -128,7 +128,8 @@
     "rules": [
       "Każda runda ma 10 pytań. Najpierw łatwo, potem trudniej.",
       "Masz 3 serca. Zły przypadek, zły rodzajnik albo koniec czasu zabiera jedno, ale najwyżej jedno na pytanie. Co 10 dobrych odpowiedzi jedno wraca.",
-      "Odpowiadaj dobrze pod rząd, żeby mnożyć punkty."
+      "Odpowiadaj dobrze pod rząd, żeby mnożyć punkty.",
+      "Pomiń łatwe rundy, żeby dostać premię punktową do pierwszego błędu."
     ],
     "casesLabel": "Przypadki (wybierz co najmniej {min})",
     "words": "Słówka: {name}, {count}.",
@@ -165,7 +166,12 @@
     "noScores": "Brak wyników. Bądź pierwszy!",
     "name": "Imię",
     "score": "Wynik",
-    "round": "Runda"
+    "round": "Runda",
+    "startAt": "Zacznij od",
+    "startHint": "Zacznij wyżej, żeby dostać premię punktową do pierwszego błędu.",
+    "bonus": "Premia ×{bonus}",
+    "bonusTitle": "Premia startowa: znika przy pierwszym błędzie",
+    "bonusLost": "Premia stracona!"
   },
   "learn": {
     "title": "Jak działają przypadki",

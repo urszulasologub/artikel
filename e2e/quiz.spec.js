@@ -74,7 +74,8 @@ test('a wrong case marks the right one and still allows choosing an article', as
   await expect(card(page).locator('.case-choice.ok')).toHaveCount(1);
 
   await card(page).locator('.choice').first().click();
-  await expect(card(page).locator('.feedback.bad')).toBeVisible();
+  // Red, or yellow if that article happens to be right: either way the case was wrong.
+  await expect(card(page).locator('.feedback')).toHaveClass(/bad|partial/);
   await expect(card(page).locator('.next')).toBeVisible();
   app.expectNoErrors();
 });

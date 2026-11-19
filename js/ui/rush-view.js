@@ -24,6 +24,7 @@ import { playSound } from './sound.js';
 import { tablePanel } from './table.js';
 
 const CASES_KEY = 'german-grammar:rush-cases';
+const START_KEY = 'german-grammar:rush-start';
 const NAME_KEY = 'german-grammar:rush-name';
 // After a pause (another browser tab, a slow device), don't count more than this per frame.
 const MAX_FRAME_MS = 250;
@@ -35,6 +36,7 @@ export function mountRushView(root, { wordSets, storage }) {
   const state = {
     screen: 'start', // 'start' | 'playing' | 'over'
     cases: loadCases(storage),
+    startLevel: loadStartLevel(storage),
     game: null,
     settings: null,
     answer: newAnswer(null),
@@ -55,9 +57,9 @@ export function mountRushView(root, { wordSets, storage }) {
 
   function start() {
     if (startProblem()) return;
-    state.game = createGame();
+    state.game = createGame(undefined, state.startLevel);
     state.rank = null;
-    state.roundBanner = 0;
+    state.roundBanner = state.game.round;
     state.screen = 'playing';
     nextQuestion();
     playSound('roundUp');
@@ -133,7 +135,12 @@ export function mountRushView(root, { wordSets, storage }) {
   }
 
   function saveScore(name) {
-    state.rank = highScores.add({ name, score: state.game.score, round: state.game.round + 1 });
+    state.rank = highScores.add({
+      name,
+      score: state.game.score,
+      round: state.game.round + 1,
+      start: state.game.startLevel,
+    });
     try {
       storage?.setItem(NAME_KEY, name);
     } catch {
@@ -166,6 +173,7 @@ export function mountRushView(root, { wordSets, storage }) {
         effects.flashes.push({ text: t('rush.timeOut'), kind: 'warning' });
         sounds.unshift('timeOut');
       }
+      if (event.type === 'bonusLost') effects.flashes.push({ text: t('rush.bonusLost'), kind: 'warning bonus' });
       if (event.type === 'roundUp') state.roundBanner = event.round;
       if (event.type === 'gameOver') sounds.push('gameOver');
     }
@@ -294,6 +302,20 @@ export function mountRushView(root, { wordSets, storage }) {
       el('fieldset', { class: 'field' },
         el('legend', {}, t('rush.casesLabel', { min: RULES.minCases })),
         el('div', { class: 'checks' }, caseBoxes)),
+      el('fieldset', { class: 'field' },
+        el('legend', {}, t('rush.startAt')),
+        el('div', { class: 'segments' }, RULES.startLevels.map(({ level, bonus }) =>
+          el('button', {
+            type: 'button',
+            class: `segment start-level${state.startLevel === level ? ' active' : ''}`,
+            'aria-pressed': String(state.startLevel === level),
+            onClick: () => {
+              state.startLevel = level;
+              saveStartLevel(storage, level);
+              render();
+            },
+          }, t(`presets.${level}`), bonus > 1 && el('span', { class: 'start-bonus' }, `×${bonus}`)))),
+        el('p', { class: 'hint' }, t('rush.startHint'))),
       el('p', { class: 'hint' },
         t('rush.words', { name: setName(set), count: t('words.count', { count: set.nouns.length }) }), ' ',
         el('a', { class: 'text-btn', href: '#words' }, t('settings.manage'))),
@@ -323,6 +345,8 @@ export function mountRushView(root, { wordSets, storage }) {
           el('span', { class: 'score-label' }, t('rush.points')),
           effects.flashes.map(({ text, kind }) => el('span', { class: `flash ${kind}`, 'aria-hidden': 'true' }, text)),
         ),
+        game.startBonus > 1 && el('span', { class: 'start-bonus-badge', title: t('rush.bonusTitle') },
+          t('rush.bonus', { bonus: game.startBonus })),
         factor > 1 && el('span', { class: `combo${effects.comboUp ? ' bump' : ''}`, title: t('quiz.streakTitle', { count: game.combo }) },
           `×${factor}`),
       ),
@@ -413,16 +437,36 @@ function renderHighScores(scores, highlight) {
     scores.length
       ? el('table', { class: 'score-table' },
         el('thead', {}, el('tr', {},
-          el('th', {}, '#'), el('th', {}, t('rush.name')), el('th', {}, t('rush.score')), el('th', {}, t('rush.round')))),
+          el('th', {}, '#'), el('th', {}, t('rush.name')), el('th', {}, t('rush.score')), el('th', {}, t('rush.round')),
+          el('th', {}, t('rush.start')))),
         el('tbody', {}, scores.map((entry, index) =>
           el('tr', { class: index === highlight ? 'mine' : '' },
-            el('td', {}, index + 1), el('td', {}, entry.name), el('td', {}, entry.score), el('td', {}, entry.round)))))
+            el('td', {}, index + 1), el('td', {}, entry.name), el('td', {}, entry.score), el('td', {}, entry.round),
+            el('td', { class: 'start-cell' }, t(`presets.${entry.start ?? 'easy'}`))))))
       : el('p', { class: 'hint' }, t('rush.noScores')),
   );
 }
 
 function emptyEffects() {
   return { flashes: [], comboUp: false, heartLost: false, heartGained: false, timeOut: false };
+}
+
+function loadStartLevel(storage) {
+  try {
+    const saved = storage?.getItem(START_KEY);
+    if (RULES.startLevels.some((option) => option.level === saved)) return saved;
+  } catch {
+    // Use the first start level.
+  }
+  return RULES.startLevels[0].level;
+}
+
+function saveStartLevel(storage, level) {
+  try {
+    storage?.setItem(START_KEY, level);
+  } catch {
+    // Not saved; the first level is used next time.
+  }
 }
 
 function loadCases(storage) {

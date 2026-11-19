@@ -2,15 +2,22 @@
 // and tick() with the time that passed, and reacts to the returned events (sounds, animations).
 //
 // Events: { type: 'points', points }, 'comboUp' (multiplier), 'timeBonus' (seconds), 'heartLost',
-// 'heartGained', 'timeOut', 'roundUp' (round), 'gameOver'.
+// 'heartGained', 'timeOut', 'bonusLost', 'roundUp' (round), 'gameOver'.
 //
 // A question costs at most one heart, whatever goes wrong: wrong case, wrong article or running out of time.
 
 import { RULES } from './rules.js';
 
-export function createGame(rules = RULES) {
+/**
+ * @param {string} [startLevel] one of rules.startLevels (by `level`); defaults to the first
+ */
+export function createGame(rules = RULES, startLevel = rules.startLevels[0].level) {
+  const start = rules.startLevels.find((option) => option.level === startLevel) ?? rules.startLevels[0];
   return withRound({
     over: false,
+    startLevel: start.level,
+    // Multiplies all points until the first mistake, for starting at a harder level.
+    startBonus: start.bonus,
     round: 0, // index into rules.rounds; past the end means an endless round
     answeredInRound: 0,
     score: 0,
@@ -20,7 +27,7 @@ export function createGame(rules = RULES) {
     hearts: rules.hearts.start,
     heartLostOnQuestion: false,
     timeLeft: null, // milliseconds, or null when the round has no timer
-  }, 0, rules);
+  }, start.round, rules);
 }
 
 /** The settings of a round. Rounds past the list repeat the last one, with less time each round. */
@@ -43,7 +50,8 @@ export function multiplier(combo, rules = RULES) {
 export function missCase(game, rules = RULES) {
   if (game.over || !rules.hearts.lostForWrongCase) return { game, events: [] };
   const events = [];
-  return { game: loseQuestionHeart({ ...game, combo: 0 }, events), events };
+  const next = loseQuestionHeart(endBonus({ ...game, combo: 0 }, events), events);
+  return { game: next, events };
 }
 
 /**
@@ -63,7 +71,7 @@ export function answer(game, result, rules = RULES) {
     next.bestCombo = Math.max(next.bestCombo, next.combo);
     const factor = multiplier(next.combo, rules);
     if (factor > before) events.push({ type: 'comboUp', multiplier: factor });
-    next = addPoints(next, round.points * factor, events);
+    next = addPoints(next, round.points * factor * next.startBonus, events);
 
     if (round.timer) {
       next.timeLeft += round.timer.bonus * 1000;
@@ -76,11 +84,12 @@ export function answer(game, result, rules = RULES) {
     }
   } else if (result === 'partial') {
     next.combo = 0;
+    next = endBonus(next, events);
     next = addPoints(next, round.points * rules.partial.pointsShare, events);
     if (rules.hearts.lostForWrongCase) next = loseQuestionHeart(next, events);
   } else {
     next.combo = 0;
-    next = loseQuestionHeart(next, events);
+    next = loseQuestionHeart(endBonus(next, events), events);
   }
   next.heartLostOnQuestion = false;
 
@@ -98,7 +107,7 @@ export function tick(game, elapsedMs, rules = RULES) {
   if (timeLeft > 0) return { game: { ...game, timeLeft }, events: [] };
 
   const events = [{ type: 'timeOut' }];
-  let next = loseQuestionHeart({ ...game, combo: 0 }, events);
+  let next = loseQuestionHeart(endBonus({ ...game, combo: 0 }, events), events);
   next.timeLeft = next.over ? 0 : roundConfig(next.round, rules).timer.seconds * 1000;
   return { game: next, events };
 }
@@ -112,6 +121,13 @@ function addPoints(game, rawPoints, events) {
   const points = Math.round(rawPoints);
   events.push({ type: 'points', points });
   return { ...game, score: game.score + points };
+}
+
+/** The first mistake ends the start bonus. */
+function endBonus(game, events) {
+  if (game.startBonus === 1) return game;
+  events.push({ type: 'bonusLost' });
+  return { ...game, startBonus: 1 };
 }
 
 /** Takes a heart, unless this question already cost one. */
