@@ -3,6 +3,8 @@
 //
 // Events: { type: 'points', points }, 'comboUp' (multiplier), 'timeBonus' (seconds), 'heartLost',
 // 'heartGained', 'timeOut', 'roundUp' (round), 'gameOver'.
+//
+// A question costs at most one heart, whatever goes wrong: wrong case, wrong article or running out of time.
 
 import { RULES } from './rules.js';
 
@@ -16,6 +18,7 @@ export function createGame(rules = RULES) {
     bestCombo: 0,
     rightAnswers: 0,
     hearts: rules.hearts.start,
+    heartLostOnQuestion: false,
     timeLeft: null, // milliseconds, or null when the round has no timer
   }, 0, rules);
 }
@@ -36,7 +39,15 @@ export function multiplier(combo, rules = RULES) {
   return Math.min(rules.combo.max, Math.round((1 + steps * rules.combo.bonus) * 10) / 10);
 }
 
+/** The player picked the wrong case. Costs the question's heart right away (see rules.hearts). */
+export function missCase(game, rules = RULES) {
+  if (game.over || !rules.hearts.lostForWrongCase) return { game, events: [] };
+  const events = [];
+  return { game: loseQuestionHeart({ ...game, combo: 0 }, events), events };
+}
+
 /**
+ * Ends the current question. The next question starts with its heart again.
  * @param {'right' | 'partial' | 'wrong'} result
  * @returns {{ game: object, events: object[] }}
  */
@@ -66,10 +77,12 @@ export function answer(game, result, rules = RULES) {
   } else if (result === 'partial') {
     next.combo = 0;
     next = addPoints(next, round.points * rules.partial.pointsShare, events);
+    if (rules.hearts.lostForWrongCase) next = loseQuestionHeart(next, events);
   } else {
     next.combo = 0;
-    next = loseHeart(next, events);
+    next = loseQuestionHeart(next, events);
   }
+  next.heartLostOnQuestion = false;
 
   if (!next.over && next.answeredInRound >= rules.questionsPerRound) {
     next = withRound(next, next.round + 1, rules);
@@ -85,7 +98,7 @@ export function tick(game, elapsedMs, rules = RULES) {
   if (timeLeft > 0) return { game: { ...game, timeLeft }, events: [] };
 
   const events = [{ type: 'timeOut' }];
-  let next = loseHeart({ ...game, combo: 0 }, events);
+  let next = loseQuestionHeart({ ...game, combo: 0 }, events);
   next.timeLeft = next.over ? 0 : roundConfig(next.round, rules).timer.seconds * 1000;
   return { game: next, events };
 }
@@ -101,10 +114,12 @@ function addPoints(game, rawPoints, events) {
   return { ...game, score: game.score + points };
 }
 
-function loseHeart(game, events) {
+/** Takes a heart, unless this question already cost one. */
+function loseQuestionHeart(game, events) {
+  if (game.heartLostOnQuestion) return game;
   const hearts = game.hearts - 1;
   events.push({ type: 'heartLost' });
-  if (hearts > 0) return { ...game, hearts };
+  if (hearts > 0) return { ...game, hearts, heartLostOnQuestion: true };
   events.push({ type: 'gameOver' });
-  return { ...game, hearts: 0, over: true };
+  return { ...game, hearts: 0, heartLostOnQuestion: true, over: true };
 }

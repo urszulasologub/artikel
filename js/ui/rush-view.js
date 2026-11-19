@@ -2,7 +2,7 @@
 // combos, a timer in later rounds and high scores. The only choice is which cases to practise.
 
 import { CASES, CASE_NAMES, CASE_QUESTIONS } from '../grammar/articles.js';
-import { answer as answerGame, createGame, multiplier, roundConfig, tick } from '../game/engine.js';
+import { answer as answerGame, createGame, missCase, multiplier, roundConfig, tick } from '../game/engine.js';
 import { MAX_NAME_LENGTH, createHighScores } from '../game/high-scores.js';
 import { RULES } from '../game/rules.js';
 import { t } from '../i18n/index.js';
@@ -90,7 +90,14 @@ export function mountRushView(root, { wordSets, storage }) {
   function onPickCase(grammarCase) {
     const { answer, settings } = state;
     if (!pickCase(answer, settings, grammarCase)) return;
-    playSound(grammarCase === answer.question.case ? 'step' : 'wrong');
+    if (grammarCase === answer.question.case) {
+      playSound('step');
+    } else {
+      // A wrong case costs the question's heart right away; the article can still be answered.
+      const step = missCase(state.game);
+      state.game = step.game;
+      react(step.events, 'wrong');
+    }
     answer.justPickedCase = true;
     render();
     answer.justPickedCase = false;

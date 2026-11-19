@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { answer, createGame, multiplier, roundConfig, tick } from '../js/game/engine.js';
+import { answer, createGame, missCase, multiplier, roundConfig, tick } from '../js/game/engine.js';
 
 // Small rules made for the tests, so tuning the real game in rules.js never breaks them.
 const RULES = {
@@ -101,4 +101,56 @@ test('endless rounds after the list get less time, down to a minimum', () => {
   assert.equal(roundConfig(9, RULES).timer.seconds, 15);
   assert.equal(roundConfig(9, RULES).timer.bonus, 2);
   assert.equal(roundConfig(9, RULES).points, 20);
+});
+
+// The same small rules, but with a heart lost for a wrong case.
+const CASE_RULES = { ...RULES, hearts: { ...RULES.hearts, lostForWrongCase: true } };
+
+test('a wrong case costs a heart right away', () => {
+  const { game, events } = missCase(createGame(CASE_RULES), CASE_RULES);
+  assert.equal(game.hearts, 2);
+  assert.deepEqual(types(events), ['heartLost']);
+});
+
+test('a question costs at most one heart: wrong case, then wrong article', () => {
+  let { game } = missCase(createGame(CASE_RULES), CASE_RULES);
+  ({ game } = answer(game, 'wrong', CASE_RULES));
+  assert.equal(game.hearts, 2);
+  // The next question can cost a heart again.
+  ({ game } = answer(game, 'wrong', CASE_RULES));
+  assert.equal(game.hearts, 1);
+});
+
+test('wrong case with the right article: half points, and the one heart is already gone', () => {
+  let { game } = missCase(createGame(CASE_RULES), CASE_RULES);
+  const step = answer(game, 'partial', CASE_RULES);
+  assert.equal(step.game.hearts, 2);
+  assert.equal(step.game.score, 5);
+  assert.ok(!types(step.events).includes('heartLost'));
+});
+
+test('a half-right answer costs a heart even without picking a case first', () => {
+  const { game } = answer(createGame(CASE_RULES), 'partial', CASE_RULES);
+  assert.equal(game.hearts, 2);
+});
+
+test('running out of time after a wrong case does not cost a second heart', () => {
+  let { game } = play(createGame(CASE_RULES), ['right', 'right', 'right']); // into the timed round
+  ({ game } = missCase(game, CASE_RULES));
+  const step = tick(game, 60_000, CASE_RULES);
+  assert.equal(step.game.hearts, 2);
+  assert.deepEqual(types(step.events), ['timeOut']);
+  assert.equal(step.game.timeLeft, 30_000);
+});
+
+test('a wrong case on the last heart ends the game', () => {
+  let { game } = play(createGame(CASE_RULES), ['wrong', 'wrong']);
+  const step = missCase(game, CASE_RULES);
+  assert.equal(step.game.over, true);
+  assert.ok(types(step.events).includes('gameOver'));
+});
+
+test('with lostForWrongCase off, a wrong case costs nothing', () => {
+  const game = createGame(RULES);
+  assert.equal(missCase(game, RULES).game, game);
 });

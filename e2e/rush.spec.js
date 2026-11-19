@@ -109,12 +109,18 @@ test('ten right answers in round 1: points, combo ×1.2, and round 2 starts', as
  */
 async function answerRight(page) {
   const card = rush(page).locator('.rush-card');
+  const article = await rightArticle(page);
+  await card.locator('.choice').filter({ hasText: new RegExp(`^${article}$`, 'i') }).click();
+}
+
+/** The right article, worked out from the case and gender shown on the card (der/die/das rounds). */
+async function rightArticle(page) {
+  const card = rush(page).locator('.rush-card');
   const caseName = await card.locator('.case-tag').evaluate((tag) => tag.firstChild.textContent);
   const genderName = await card.locator('.hints .tag:not(.case-tag)').textContent();
   const grammarCase = Object.keys(CASE_NAMES).find((key) => CASE_NAMES[key] === caseName);
   const gender = { masculine: 'm', feminine: 'f', neuter: 'n', plural: 'pl' }[genderName.trim()];
-  const article = getArticle('definite', grammarCase, gender);
-  await card.locator('.choice').filter({ hasText: new RegExp(`^${article}$`, 'i') }).click();
+  return getArticle('definite', grammarCase, gender);
 }
 
 test('the score bar stays visible under the header while scrolling', async ({ page }) => {
@@ -125,5 +131,35 @@ test('the score bar stays visible under the header while scrolling', async ({ pa
   const hud = await rush(page).locator('.rush-hud').boundingBox();
   expect(hud.y).toBeGreaterThanOrEqual(Math.floor(header.y + header.height) - 1);
   await expect(rush(page).locator('.hearts')).toBeInViewport();
+  app.expectNoErrors();
+});
+
+test('a wrong case costs one heart at once, and a wrong article on the same question costs no more', async ({ page }) => {
+  const app = await openRush(page);
+  await rush(page).getByRole('button', { name: 'Start' }).click();
+  const card = rush(page).locator('.rush-card');
+
+  // Round 1 has no case step: answer it right to reach round 2, which asks for the case first.
+  for (let i = 0; i < 10; i++) {
+    await answerRight(page);
+    await card.locator('.next').click();
+  }
+  await expect(rush(page).locator('.round-banner')).toContainText('Round 2');
+
+  // Pick case buttons until one is wrong (each question has only one right case).
+  for (let attempt = 0; attempt < 10; attempt++) {
+    await card.locator('.case-choice').first().click();
+    if (await card.locator('.case-choice.bad').count()) break;
+    await answerRight(page);
+    await card.locator('.next').click();
+  }
+  await expect(card.locator('.case-choice.bad')).toHaveCount(1);
+  await expect(rush(page).locator('.heart:not(.empty)')).toHaveCount(2);
+
+  // Now a wrong article as well: still only one heart lost for this question.
+  const right = await rightArticle(page);
+  await card.locator('.choice').filter({ hasNotText: new RegExp(`^${right}$`, 'i') }).first().click();
+  await expect(card.locator('.feedback.bad')).toBeVisible();
+  await expect(rush(page).locator('.heart:not(.empty)')).toHaveCount(2);
   app.expectNoErrors();
 });

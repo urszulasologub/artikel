@@ -130,7 +130,7 @@
     "tagline": "How far can you get? Every round is harder, and from round 6 the clock is ticking.",
     "rules": [
       "Each round has 10 questions. Easy first, then harder.",
-      "You have 3 hearts. A wrong answer or running out of time costs one; every 10 right answers win one back.",
+      "You have 3 hearts. A wrong case, a wrong article or running out of time costs one, but never more than one per question. Every 10 right answers win one back.",
       "Answer right in a row to multiply your points."
     ],
     "casesLabel": "Cases (choose at least {min})",

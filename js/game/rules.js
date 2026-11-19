@@ -12,13 +12,17 @@ export const RULES = {
     max: 3,
     // One heart comes back after every this many right answers (if not full).
     regainEvery: 10,
+    // Picking the wrong case costs a heart straight away. A question never costs more than one heart,
+    // whatever goes wrong (case, article or time).
+    lostForWrongCase: true,
   },
 
   // Points are multiplied while answering right in a row:
   // ×1.2 from 10 in a row, ×1.4 from 20, … up to `max`. Points are rounded to whole numbers.
   combo: { every: 10, bonus: 0.2, max: 2 },
 
-  // Right article but wrong case: a share of the points, no heart lost, combo ends.
+  // Right article but wrong case: a share of the points, and the combo ends.
+  // (The heart for the wrong case is set by hearts.lostForWrongCase.)
   partial: { pointsShare: 0.5 },
 
   // `level` is a difficulty preset from settings.js. `timer` (seconds, plus `bonus` seconds per right
